@@ -2010,40 +2010,81 @@
 
   <button onclick="exportTreeToExcel()">Зберегти дерево в Excel</button>
 
-  <script>
-function exportTreeToExcel() {
-  const treeRoot = document.querySelector("ul"); // головне дерево
-  const rows = [["Категорія", "Підкатегорія", "Товар"]];
-
-  function traverse(node, level = []) {
+<script>
+  // Знаходимо максимальну глибину дерева
+  function getMaxDepth(node, depth = 1) {
+    let max = depth;
     const children = Array.from(node.children);
-    for (const child of children) {
-      if (child.tagName === "LI") {
-        const span = child.querySelector("span");
-        const label = span ? span.textContent.trim() : null;
-        const sublist = child.querySelector("ul");
 
-        if (label && sublist) {
-          traverse(sublist, [...level, label]);
-        } else if (label && !sublist) {
-          rows.push([...level, label]);
-        } else if (!label && sublist) {
-          traverse(sublist, level);
-        } else if (!label && !sublist) {
-          const text = child.textContent.trim();
-          if (text) rows.push([...level, text]);
-        }
+    for (const li of children) {
+      if (li.tagName !== "LI") continue;
+
+      const sub = li.querySelector(":scope > ul");
+      if (sub) {
+        max = Math.max(max, getMaxDepth(sub, depth + 1));
+      }
+    }
+    return max;
+  }
+
+  // Рекурсивний обхід дерева
+  function traverse(node, level = [], rows) {
+    const items = Array.from(node.children);
+
+    for (const li of items) {
+      if (li.tagName !== "LI") continue;
+
+      const span = li.firstElementChild?.tagName === "SPAN"
+        ? li.firstElementChild
+        : null;
+
+      const label = span ? span.textContent.trim() : null;
+      const sublist = li.querySelector(":scope > ul");
+
+      if (label && sublist) {
+        // Категорія з підкатегоріями
+        traverse(sublist, [...level, label], rows);
+      } 
+      else if (label && !sublist) {
+        // Категорія без підкатегорій
+        rows.push([...level, label]);
+      } 
+      else if (!label && !sublist) {
+        // Товар
+        const text = li.textContent.trim();
+        if (text) rows.push([...level, text]);
+      } 
+      else if (!label && sublist) {
+        // Вкладений список без заголовка
+        traverse(sublist, level, rows);
       }
     }
   }
 
-  traverse(treeRoot);
+  // Основна функція експорту
+  function exportTreeToExcel() {
+    const treeRoot = document.querySelector("ul");
 
-  const worksheet = XLSX.utils.aoa_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Каталог");
-  XLSX.writeFile(workbook, "Каталог_товарів.xlsx");
-}
+    // 1. Визначаємо максимальну глибину
+    const maxDepth = getMaxDepth(treeRoot);
+
+    // 2. Формуємо заголовки
+    const header = [];
+    for (let i = 1; i <= maxDepth; i++) {
+      header.push(`Рівень ${i}`);
+    }
+
+    const rows = [header];
+
+    // 3. Обходимо дерево
+    traverse(treeRoot, [], rows);
+
+    // 4. Експорт у Excel
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Каталог");
+    XLSX.writeFile(workbook, "Каталог_товарів.xlsx");
+  }
 </script>
 
 </body>
