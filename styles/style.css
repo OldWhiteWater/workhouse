@@ -1,41 +1,85 @@
-html {
-  font-size: 10px;
-  font-family: 'Open Sans', sans-serif;
-}
-
-
-h1 {
-  font-size: 60px;
-  text-align: center;
-}
-
-p, li {
-  font-size: 16px;
-  line-height: 2;
-  letter-spacing: 1px;
-}
-
-
-html {
-  background-color: #00539F;
-}
-
 body {
-  width: 600px;
-  margin: 0 auto;
-  background-color: #FF9500;
-  padding: 0 20px 20px 20px;
-  border: 5px solid black;
-}
-
-h1 {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f4f6f8;
   margin: 0;
-  padding: 20px 0;
-  color: #00539F;
-  text-shadow: 3px 3px 1px black;
+  padding: 20px;
 }
 
-img {
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+li {
+  margin: 6px 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+li:hover {
+  background-color: #e0e7ff;
+}
+
+.nested {
+  display: none;
+  margin-left: 10px;
+  border-left: 2px dashed #ccc;
+  padding-left: 10px;
+}
+
+.active {
   display: block;
-  margin: 0 auto;
+}
+
+.caret {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  color: #2c3e50;
+  display: inline-block;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.caret:hover {
+  background-color: #dfe6e9;
+}
+
+.caret::before {
+  content: "▶";
+  color: #2980b9;
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.2s ease;
+}
+
+.caret-down::before {
+  content: "▼";
+}
+
+/* Подсветка при наведении */
+#importedTree li:hover {
+  background-color: #eef4ff;
+  border-radius: 4px;
+}
+
+/* Активный элемент (кликнутый) */
+.active-item {
+  background-color: #dce7ff;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #1a3d7c;
+}
+
+/* Плавная анимация */
+#importedTree li {
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
