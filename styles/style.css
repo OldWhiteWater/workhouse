@@ -83,3 +83,42 @@ li:hover {
 #importedTree li {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
+
+/* ✅ Адаптивность для телефонов */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  ul {
+    padding-left: 12px;
+  }
+
+  li {
+    margin: 4px 0;
+    padding: 6px;
+    font-size: 15px;
+  }
+
+  .caret {
+    font-size: 15px;
+    padding: 6px;
+  }
+
+  .caret::before {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+
+  .nested {
+    margin-left: 6px;
+    padding-left: 6px;
+    border-left: 1px dashed #bbb; /* тоньше линия */
+  }
+}
