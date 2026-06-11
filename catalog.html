@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Каталог освітлення</title>
+  <style>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+header, footer {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+header img, footer img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 24px;
+  gap: 24px;
+}
+
+aside {
+  width: 280px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  display: none;
+  height: fit-content;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+aside h3 {
+  margin-top: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.catalog-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+section.tile-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+.tile {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  box-sizing: border-box;
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.tile img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
+
+.tile span {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  color: #0f172a;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.results-panel {
+  width: 100%;
+}
+
+.results-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+/* --- OVERHAULED PREMIUM PRODUCT CARD DESIGN --- */
+.product-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.card-name {
+  margin-bottom: 4px;
+}
+
+.product-title-text {
+  font-weight: 700;
+  font-size: 16px;
+  color: #0f172a;
+  line-height: 1.4;
+  display: block;
+  word-break: break-word;
+}
+
+.card-specs-box {
+  background-color: #f8fafc;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid #f1f5f9;
+  margin-top: auto;
+}
+
+.card-line {
+  font-size: 13px;
+  line-height: 1.4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 6px;
+}
+.card-line:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.card-line-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.card-line-value {
+  font-weight: 600;
+  color: #334155;
+  text-align: right;
+  word-break: break-all;
+}
+
+.card-line-value.highlight {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.card-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* --- DETAILS & SUMMARY FIXED CHEVRON BUG --- */
+details {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+details summary {
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+  padding: 12px 40px 12px 14px;
+  list-style: none;
+  position: relative;
+  user-select: none;
+  background-color: #f8fafc;
+  transition: background-color 0.2s;
+}
+
+details summary:hover {
+  background-color: #f1f5f9;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+  transform: translateY(-65%) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+details[open] summary::after {
+  transform: translateY(-25%) rotate(-135deg);
+}
+
+details ul {
+  list-style: none;
+  padding: 12px 14px;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border-top: 1px solid #e2e8f0;
+}
+
+details ul::-webkit-scrollbar {
+  width: 4px;
+}
+details ul::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+details li {
+  margin: 8px 0;
+}
+details li:first-child { margin-top: 0; }
+details li:last-child { margin-bottom: 0; }
+
+details label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334155;
+  font-size: 13px;
+  transition: color 0.15s;
+}
+details label:hover {
+  color: #0f172a;
+}
+
+/* --- BUTTONS & PILLS --- */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+
+.reset-filters-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-filters-button:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.active-tags-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  min-height: 36px;
+}
+
+.active-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.active-tag:hover {
+  background: #dcfce7;
+  transform: translateY(-1px);
+}
+
+.active-tag .tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #bbf7d0;
+  color: #166534;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.results-count {
+  font-size: 13.5px;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.filter-option-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.filter-option-disabled label {
+  color: #94a3b8 !important;
+}
+
+.filter-group-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: auto;
+  padding: 0 5px;
+}
+
+.catalog-message {
+  grid-column: 1 / -1;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #334155;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.catalog-message.error {
+  border-color: #f97316;
+  background-color: #fff7ed;
+  color: #c2410c;
+}
+
+/* --- ADDITIONS FOR INSTANT SEARCH & PAGINATION --- */
+.search-container {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.load-more-button {
+  padding: 12px 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.load-more-button:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+  aside {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .results-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+</style>
+</head>
+<body>
+
+  <header>
+    <img src="images/header-image.jpg" alt="Заголовок сайту" />
+  </header>
+
+  <main>
+    <aside id="sidePanel">
+      <button id="backButton" class="back-button">Назад</button>
+      <h3 id="sideTitle" style="margin-top: 10px;">Категорія</h3>
+      <div id="sideList"></div>
+    </aside>
+
+    <div class="catalog-content">
+      <section class="tile-container" id="tileSection"></section>
+      <div id="resultsContainer" class="results-panel" style="display:none;"></div>
+    </div>
+  </main>
+
+  <footer>
+    <img src="images/footer-image.jpg" alt="Футер сайту" />
+  </footer>
+
+  <script src="scripts/xlsx.full.min.js"></script>
+  <script>
+const staticTiles = [
+  {
+    img: 'img1.jpg',
+    label: 'Ліхтарі габаритні та декоративного освітлення',
+    items: ['Світлодіодні стрічки', 'Габаритні ліхтарі', 'Декоративні елементи']
+  },
+  {
+    img: 'img2.jpg',
+    label: 'Лампи побутові та промислові',
+    items: ['LED лампи', 'Галогенні', 'Люмінесцентні']
+  },
+  {
+    img: 'img3.jpg',
+    label: 'Сигнальні вогні та підсвічування номерного знаку',
+    items: ['Лампи номерного знаку', 'Сигнальні вогні']
+  },
+  {
+    img: 'img4.jpg',
+    label: 'Лампи автомобільні',
+    items: ['Ближнє світло', 'Дальнє світло', 'Поворотники']
+  },
+  {
+    img: 'img5.jpg',
+    label: 'Фари головного освітлення та передні протитуманні',
+    items: ['Головні фари', 'Протитуманні фари']
+  },
+  {
+    img: 'img6.jpg',
+    label: 'Додаткові фари та ліхтарі',
+    items: ['Робочі фари', 'Бокові ліхтарі']
+  },
+  {
+    img: 'img7.jpg',
+    label: 'Проблискові маяки, шашки таксі',
+    items: ['Маяки', 'Таксі-шашки']
+  },
+  {
+    img: 'img8.jpg',
+    label: 'Патрони та роз\'єми для ламп, фар, ліхтарів',
+    items: ['Патрони', 'Роз\'єми', 'Перехідники']
+  },
+  {
+    img: 'img9.jpg',
+    label: 'Освітлення внутрішнього простору ТЗ',
+    items: ['Плафони', 'Підсвічування салону']
+  },
+  {
+    img: 'img10.jpg',
+    label: 'Інтер\'єрні світильники',
+    items: ['Настінні', 'Декоративні', 'Точкові']
+  },
+  {
+    img: 'img11.jpg',
+    label: 'Ліхтарі, лампи портативні та переносні',
+    items: ['Акумуляторні', 'Переноски', 'Ручні ліхтарі']
+  },
+  {
+    img: 'img12.jpg',
+    label: 'Ліхтарі екстер\'єрні',
+    items: ['Фасадні', 'Прожектори']
+  },
+  {
+    img: 'img13.jpg',
+    label: 'Захисні решітки для фар та ліхтарів',
+    items: ['Решітки', 'Захисні накладки']
+  }
+];
+
+const lampDetails = {
+  'Тип цоколя': ['A60', 'A65', 'A70', 'C37', 'E40'],
+  'Номінальна потужність, Вт': ['5', '7', '8', '10', '15', '18'],
+  'Температура світла, К': ['3000k', '4100k', '5000k', '6500k'],
+  'Світловий потік, Lm': ['400', '520', '600', '800', '1000']
+};
+
+const XLSX_PATH = './source/bearings.xlsx';
+const COLUMN = {
+  a: 0,
+  b: 1,
+  c: 2,
+  d: 3,
+  e: 4,
+  f: 5,
+  m: 12
+};
+
+const DISPLAY_COLUMNS = [COLUMN.a, COLUMN.b, COLUMN.c];
+const FILTER_COLUMNS = [COLUMN.d, COLUMN.e, COLUMN.f];
+
+let tiles = [...staticTiles];
+let bearingDetails = {};
+
+let container = document.getElementById('tileSection');
+const resultsContainer = document.getElementById('resultsContainer');
+const sidePanel = document.getElementById('sidePanel');
+const sideTitle = document.getElementById('sideTitle');
+const sideList = document.getElementById('sideList');
+const backButton = document.getElementById('backButton');
+
+function normalizeCell(value) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  return String(value).trim();
+}
+
+function sortValues(values) {
+  return [...values].sort((a, b) => {
+    const first = Number(String(a).replace(',', '.'));
+    const second = Number(String(b).replace(',', '.'));
+
+    if (!Number.isNaN(first) && !Number.isNaN(second)) {
+      return first - second;
+    }
+    return String(a).localeCompare(String(b), 'uk');
+  });
+}
+
+const filterValueColorMap = new Map();
+
+function getColorPalette() {
+  return [
+    { bg: '#fef3c7', border: '#fcd34d', text: '#b45309' },
+    { bg: '#dbeafe', border: '#bfdbfe', text: '#1e40af' },
+    { bg: '#e0e7ff', border: '#c7d2fe', text: '#4f46e5' },
+    { bg: '#fce7f3', border: '#fbcfe8', text: '#be185d' },
+    { bg: '#f0fdf4', border: '#bbf7d0', text: '#166534' },
+    { bg: '#fef2f2', border: '#fee2e2', text: '#b91c1c' },
+    { bg: '#fefce8', border: '#fef08a', text: '#854d0e' },
+    { bg: '#f5f3ff', border: '#ede9fe', text: '#5b21b6' },
+    { bg: '#f0fdfa', border: '#ccfbf1', text: '#0d9488' },
+    { bg: '#ecfdf5', border: '#d1fae5', text: '#047857' }
+  ];
+}
+
+function getColorForValue(value) {
+  if (!filterValueColorMap.has(value)) {
+    const palette = getColorPalette();
+    const index = filterValueColorMap.size % palette.length;
+    filterValueColorMap.set(value, palette[index]);
+  }
+  return filterValueColorMap.get(value);
+}
+
+function buildBearingCatalog(rows) {
+  const header = rows[0] || [];
+  const displayHeaders = DISPLAY_COLUMNS.map(index => normalizeCell(header[index]) || `Стовпець ${String.fromCharCode(65 + index)}`);
+  const filterHeaders = FILTER_COLUMNS.map(index => normalizeCell(header[index]) || `Стовpeць ${String.fromCharCode(65 + index)}`);
+
+  const categoryRows = {};
+  const details = {};
+  const categoryOrder = [];
+
+  rows.slice(1).forEach(row => {
+    const category = normalizeCell(row[COLUMN.m]);
+
+    if (!category) {
+      return;
+    }
+
+    if (!categoryRows[category]) {
+      categoryRows[category] = [];
+      categoryOrder.push(category);
+    }
+    categoryRows[category].push(row);
+  });
+
+  categoryOrder.forEach(category => {
+    const rowsForCategory = categoryRows[category];
+    const displayValueSets = {};
+    const filterValueSets = {};
+
+    displayHeaders.forEach(headerName => {
+      displayValueSets[headerName] = new Set();
+    });
+
+    filterHeaders.forEach(headerName => {
+      filterValueSets[headerName] = new Set();
+    });
+
+    rowsForCategory.forEach(row => {
+      DISPLAY_COLUMNS.forEach((colIndex, idx) => {
+        const value = normalizeCell(row[colIndex]);
+        if (value) displayValueSets[displayHeaders[idx]].add(value);
+      });
+
+      FILTER_COLUMNS.forEach((colIndex, idx) => {
+        const value = normalizeCell(row[colIndex]);
+        if (value) filterValueSets[filterHeaders[idx]].add(value);
+      });
+    });
+
+    details[category] = {
+      rows: rowsForCategory,
+      displayHeaders,
+      filterHeaders,
+      displayValues: Object.fromEntries(
+        displayHeaders.map(name => [name, sortValues(displayValueSets[name])])
+      ),
+      filterValues: Object.fromEntries(
+        filterHeaders.map(name => [name, sortValues(filterValueSets[name])])
+      )
+    };
+  });
+
+  return {
+    tiles: categoryOrder.map(label => ({ label, items: [] })),
+    details
+  };
+}
+
+async function loadBearingCatalog() {
+  if (!window.XLSX) {
+    throw new Error('SheetJS XLSX library is not loaded.');
+  }
+
+  const fileUrl = new URL(XLSX_PATH, window.location.href);
+  fileUrl.searchParams.set('v', Date.now());
+  const response = await fetch(fileUrl.toString(), { cache: 'no-store' });
+
+  if (!response.ok) {
+    throw new Error(`Cannot load ${XLSX_PATH}: ${response.status} ${response.statusText}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+  const allRows = [];
+  workbook.SheetNames.forEach(name => {
+    const sheet = workbook.Sheets[name];
+    const sheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
+    if (sheetRows.length > 1) {
+      console.debug('Read sheet:', name, 'rows:', sheetRows.length);
+      const normalized = sheetRows.slice(1).map(r => {
+        const row = Array.isArray(r) ? r.slice() : [];
+        while (row.length <= COLUMN.m) row.push('');
+        return row;
+      });
+      allRows.push(...normalized);
+    }
+  });
+
+  if (allRows.length === 0 && workbook.SheetNames.length > 0) {
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const sheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
+    console.debug('Fallback read first sheet:', workbook.SheetNames[0], 'rows:', sheetRows.length);
+    const normalized = sheetRows.slice(1).map(r => {
+      const row = Array.isArray(r) ? r.slice() : [];
+      while (row.length <= COLUMN.m) row.push('');
+      return row;
+    });
+    allRows.push(...normalized);
+  }
+
+  const headerRow = workbook.SheetNames.length > 0
+    ? (() => {
+        const firstSheetRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '', blankrows: false });
+        const row = Array.isArray(firstSheetRows[0]) ? firstSheetRows[0].slice() : [];
+        while (row.length <= COLUMN.m) row.push('');
+        return row;
+      })()
+    : [];
+
+  return buildBearingCatalog([headerRow, ...allRows]);
+}
+
+function appendDetailGroups(target, detailGroups, withCheckboxes = true) {
+  for (const [group, values] of Object.entries(detailGroups)) {
+    const details = document.createElement('details');
+    const summary = document.createElement('summary');
+    summary.textContent = group;
+    details.appendChild(summary);
+
+    const ul = document.createElement('ul');
+    ul.style.paddingLeft = '20px';
+    ul.style.listStyle = 'none';
+
+    values.forEach(val => {
+      const li = document.createElement('li');
+
+      if (withCheckboxes) {
+        const label = document.createElement('label');
+        label.style.cursor = 'pointer';
+        label.style.display = 'block';
+        label.style.marginBottom = '5px';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = val;
+        checkbox.style.marginRight = '8px';
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(val));
+        li.appendChild(label);
+      } else {
+        li.textContent = val;
+      }
+      ul.appendChild(li);
+    });
+
+    details.appendChild(ul);
+    target.appendChild(details);
+  }
+}
+
+function renderDisplayValues(resultContainer, filteredData) {
+  resultContainer.innerHTML = '';
+  resultContainer.className = 'results-cards-grid';
+
+  if (!filteredData.rows || filteredData.rows.length === 0) {
+    const empty = document.createElement('div');
+    empty.textContent = 'Немає значень для цього набору фільтрів.';
+    empty.style.color = '#666';
+    empty.style.padding = '20px';
+    resultContainer.appendChild(empty);
+    return;
+  }
+
+  filteredData.rows.forEach(row => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+
+    const kartka = normalizeCell(row[DISPLAY_COLUMNS[0]]);
+    const kod = normalizeCell(row[DISPLAY_COLUMNS[1]]);
+    const name = normalizeCell(row[DISPLAY_COLUMNS[2]]);
+    
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    
+    const nameElem = document.createElement('div');
+    nameElem.className = 'card-name';
+    nameElem.innerHTML = `<span class="product-title-text">${name || 'Без назви'}</span>`;
+    header.appendChild(nameElem);
+    
+    const specsBox = document.createElement('div');
+    specsBox.className = 'card-specs-box';
+    
+    const kartkaElem = document.createElement('div');
+    kartkaElem.className = 'card-line';
+    kartkaElem.innerHTML = `<span class="card-line-label">Картка:</span> <span class="card-line-value">${kartka || 'N/A'}</span>`;
+    specsBox.appendChild(kartkaElem);
+    
+    const kodElem = document.createElement('div');
+    kodElem.className = 'card-line';
+    kodElem.innerHTML = `<span class="card-line-label">Код за каталогом:</span> <span class="card-line-value highlight">${kod || 'N/A'}</span>`;
+    specsBox.appendChild(kodElem);
+    
+    header.appendChild(specsBox);
+    card.appendChild(header);
+
+    const filtersDiv = document.createElement('div');
+    filtersDiv.className = 'card-filters';
+    
+    filteredData.filterHeaders.forEach((headerName, index) => {
+      const filterValue = normalizeCell(row[FILTER_COLUMNS[index]]);
+      if (filterValue) {
+        const filterTag = document.createElement('span');
+        filterTag.className = 'filter-tag';
+        filterTag.textContent = `${headerName}: ${filterValue}`;
+        filtersDiv.appendChild(filterTag);
+      }
+    });
+    
+    card.appendChild(filtersDiv);
+    resultContainer.appendChild(card);
+  });
+}
+
+function getSelectedFilters(filterPanel) {
+  const filters = {};
+  filterPanel.querySelectorAll('input[type="checkbox"][data-filter-group]').forEach(cb => {
+    const group = cb.dataset.filterGroup;
+    if (!filters[group]) filters[group] = [];
+    if (cb.checked) filters[group].push(cb.value);
+  });
+  return filters;
+}
+
+function getFilteredDisplayValues(categoryDetails, filters) {
+  const active = Object.entries(filters).filter(([, v]) => v.length > 0);
+  const filteredRows = categoryDetails.rows.filter(row =>
+    active.every(([headerName, values]) => {
+      const idx = categoryDetails.filterHeaders.indexOf(headerName);
+      if (idx === -1) return true;
+      return values.includes(normalizeCell(row[FILTER_COLUMNS[idx]]));
+    })
+  );
+  return {
+    rows: filteredRows,
+    filterHeaders: categoryDetails.filterHeaders,
+    displayHeaders: categoryDetails.displayHeaders
+  };
+}
+
+function getAvailableValuesForGroup(categoryDetails, filters, targetGroup) {
+  const otherActive = Object.entries(filters).filter(([g, v]) => g !== targetGroup && v.length > 0);
+  const subset = categoryDetails.rows.filter(row =>
+    otherActive.every(([headerName, values]) => {
+      const idx = categoryDetails.filterHeaders.indexOf(headerName);
+      if (idx === -1) return true;
+      return values.includes(normalizeCell(row[FILTER_COLUMNS[idx]]));
+    })
+  );
+  const idx = categoryDetails.filterHeaders.indexOf(targetGroup);
+  const available = new Set();
+  subset.forEach(row => {
+    const v = normalizeCell(row[FILTER_COLUMNS[idx]]);
+    if (v) available.add(v);
+  });
+  return available;
+}
+
+function renderActiveTags(tagsBar, filters, filterPanel, categoryDetails, onUpdate) {
+  tagsBar.innerHTML = '';
+  const active = Object.entries(filters).filter(([, v]) => v.length > 0);
+  if (active.length === 0) return;
+
+  active.forEach(([group, values]) => {
+    values.forEach(value => {
+      const tag = document.createElement('span');
+      tag.className = 'active-tag';
+      tag.title = `Прибрати фільтр: ${group} = ${value}`;
+
+      const label = document.createElement('span');
+      label.textContent = `${group}: ${value}`;
+
+      const x = document.createElement('span');
+      x.className = 'tag-remove';
+      x.textContent = '×';
+
+      tag.appendChild(label);
+      tag.appendChild(x);
+
+      tag.addEventListener('click', () => {
+        const cb = filterPanel.querySelector(
+          `input[type="checkbox"][data-filter-group="${CSS.escape(group)}"][value="${CSS.escape(value)}"]`
+        );
+        if (cb) { cb.checked = false; onUpdate(); }
+      });
+      tagsBar.appendChild(tag);
+    });
+  });
+
+  const resetLink = document.createElement('button');
+  resetLink.type = 'button';
+  resetLink.className = 'reset-filters-button';
+  resetLink.textContent = 'Скинути всі';
+  resetLink.style.marginLeft = 'auto';
+  resetLink.onclick = () => {
+    filterPanel.querySelectorAll('input[type="checkbox"][data-filter-group]').forEach(cb => cb.checked = false);
+    onUpdate();
+  };
+  tagsBar.appendChild(resetLink);
+}
+
+function updateFilterAvailability(filterPanel, categoryDetails, filters) {
+  categoryDetails.filterHeaders.forEach(group => {
+    const available = getAvailableValuesForGroup(categoryDetails, filters, group);
+
+    const summary = filterPanel.querySelector(`summary[data-group="${CSS.escape(group)}"]`);
+    if (summary) {
+      const selected = (filters[group] || []).length;
+      let badge = summary.querySelector('.filter-group-count');
+      if (selected > 0) {
+        if (!badge) { badge = document.createElement('span'); badge.className = 'filter-group-count'; summary.appendChild(badge); }
+        badge.textContent = selected;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+
+    filterPanel.querySelectorAll(`input[type="checkbox"][data-filter-group="${CSS.escape(group)}"]`).forEach(cb => {
+      const li = cb.closest('li');
+      if (!li) return;
+      if (!available.has(cb.value) && !cb.checked) {
+        li.classList.add('filter-option-disabled');
+      } else {
+        li.classList.remove('filter-option-disabled');
+      }
+    });
+  });
+}
+
+function createFilterSection(categoryDetails, onFilterChange) {
+  const filterSection = document.createElement('div');
+  filterSection.style.marginBottom = '20px';
+
+  const title = document.createElement('h4');
+  title.textContent = 'Фільтри';
+  title.style.margin = '0 0 10px 0';
+  filterSection.appendChild(title);
+
+  categoryDetails.filterHeaders.forEach((headerName, headerIdx) => {
+    const values = categoryDetails.filterValues[headerName];
+    if (!values || values.length === 0) return;
+
+    const colIndex = FILTER_COLUMNS[headerIdx];
+
+    const details = document.createElement('details');
+    details.className = 'details-filter-panel';
+    details.open = true;
+
+    const summary = document.createElement('summary');
+    summary.textContent = headerName;
+    summary.dataset.group = headerName;
+    details.appendChild(summary);
+
+    const ul = document.createElement('ul');
+    ul.style.paddingLeft = '0';
+    ul.style.listStyle = 'none';
+
+    values.forEach(value => {
+      const li = document.createElement('li');
+      const label = document.createElement('label');
+      label.style.cursor = 'pointer';
+      label.style.display = 'block';
+      label.style.marginBottom = '5px';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = value;
+      checkbox.style.marginRight = '8px';
+      checkbox.dataset.filterGroup = headerName;
+      checkbox.dataset.filterValue = value;
+      checkbox.addEventListener('click', e => e.stopPropagation());
+      checkbox.addEventListener('change', onFilterChange);
+
+      const count = categoryDetails.rows.filter(row => normalizeCell(row[colIndex]) === value).length;
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(value));
+      
+      const countSpan = document.createElement('span');
+      countSpan.textContent = ` (${count})`;
+      countSpan.style.color = '#94a3b8';
+      countSpan.style.fontSize = '12px';
+      countSpan.style.marginLeft = '4px';
+      label.appendChild(countSpan);
+
+      li.appendChild(label);
+      ul.appendChild(li);
+    });
+
+    details.appendChild(ul);
+    filterSection.appendChild(details);
+  });
+
+  return filterSection;
+}
+
+function renderCategoryDetails(categoryDetails) {
+  let itemsToShow = 12;
+  let searchQuery = '';
+
+  const filterPanel = document.createElement('div');
+  filterPanel.style.marginBottom = '22px';
+
+  const searchContainer = document.createElement('div');
+  searchContainer.className = 'search-container';
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.className = 'search-input';
+  searchInput.placeholder = 'Швидкий пошук за кодом, карткою або найменуванням...';
+  searchContainer.appendChild(searchInput);
+
+  searchInput.addEventListener('input', () => {
+    searchQuery = searchInput.value.toLowerCase().trim();
+    itemsToShow = 12;
+    updateResults();
+  });
+
+  const tagsBar = document.createElement('div');
+  tagsBar.className = 'active-tags-bar';
+
+  const countLabel = document.createElement('div');
+  countLabel.className = 'results-count';
+
+  const displayValuesContainer = document.createElement('div');
+
+  const updateResults = () => {
+    const filters = getSelectedFilters(filterPanel);
+    const filtered = getFilteredDisplayValues(categoryDetails, filters);
+
+    if (searchQuery) {
+      filtered.rows = filtered.rows.filter(row => {
+        const kartka = normalizeCell(row[DISPLAY_COLUMNS[0]]).toLowerCase();
+        const kod = normalizeCell(row[DISPLAY_COLUMNS[1]]).toLowerCase();
+        const name = normalizeCell(row[DISPLAY_COLUMNS[2]]).toLowerCase();
+        return kartka.includes(searchQuery) || kod.includes(searchQuery) || name.includes(searchQuery);
+      });
+    }
+
+    const totalFilteredCount = filtered.rows.length;
+    const paginatedRows = filtered.rows.slice(0, itemsToShow);
+
+    renderActiveTags(tagsBar, filters, filterPanel, categoryDetails, () => {
+      itemsToShow = 12;
+      updateResults();
+    });
+    updateFilterAvailability(filterPanel, categoryDetails, filters);
+
+    renderDisplayValues(displayValuesContainer, {
+      rows: paginatedRows,
+      filterHeaders: filtered.filterHeaders,
+      displayHeaders: filtered.displayHeaders
+    });
+
+    if (totalFilteredCount === 0) {
+      countLabel.textContent = 'Немає товарів, що відповідають вибраним фільтрам.';
+      countLabel.style.color = '#dc2626';
+    } else {
+      countLabel.textContent = `Показано: ${Math.min(itemsToShow, totalFilteredCount)} з ${totalFilteredCount} товарів`;
+      countLabel.style.color = '#64748b';
+    }
+
+    let loadMoreBtn = resultsContainer.querySelector('.load-more-container');
+    if (loadMoreBtn) loadMoreBtn.remove();
+
+    if (totalFilteredCount > itemsToShow) {
+      const loadMoreContainer = document.createElement('div');
+      loadMoreContainer.className = 'load-more-container';
+      const btn = document.createElement('button');
+      btn.className = 'load-more-button';
+      btn.textContent = 'Показати ще';
+      btn.onclick = () => {
+        itemsToShow += 12;
+        updateResults();
+      };
+      loadMoreContainer.appendChild(btn);
+      resultsContainer.appendChild(loadMoreContainer);
+    }
+  };
+
+  const handleFilterChange = () => {
+    itemsToShow = 12;
+    updateResults();
+  };
+
+  const filtersEl = createFilterSection(categoryDetails, handleFilterChange);
+  filterPanel.appendChild(filtersEl);
+
+  updateResults();
+
+  sideList.appendChild(filterPanel);
+  resultsContainer.appendChild(searchContainer);
+  resultsContainer.appendChild(tagsBar);
+  resultsContainer.appendChild(countLabel);
+  resultsContainer.appendChild(displayValuesContainer);
+}
+
+function showTileDetails(tile, activeContainer) {
+  if (activeContainer && activeContainer.style) activeContainer.style.display = 'none';
+  if (resultsContainer) {
+    resultsContainer.style.display = 'block';
+    resultsContainer.innerHTML = '';
+    resultsContainer.className = 'results-panel';
+  }
+
+  sideTitle.textContent = tile.label;
+  sideList.innerHTML = '';
+
+  if (tile.items && tile.items.length > 0) {
+    const itemsUl = document.createElement('ul');
+    itemsUl.style.paddingLeft = '20px';
+    itemsUl.style.margin = '0 0 15px 0';
+    tile.items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      itemsUl.appendChild(li);
+    });
+    sideList.appendChild(itemsUl);
+  }
+
+  if (tile.label === 'Лампи побутові та промислові') {
+    appendDetailGroups(sideList, lampDetails);
+  }
+
+  if (bearingDetails[tile.label]) {
+    renderCategoryDetails(bearingDetails[tile.label]);
+  }
+  sidePanel.style.display = 'block';
+}
+
+function createTileElement(tile, activeContainer) {
+  const div = document.createElement('div');
+  div.className = tile.img ? 'tile' : 'tile no-image';
+  div.innerHTML = `
+    ${tile.img ? `<img src="images/${tile.img}" alt="${tile.label}" />` : ''}
+    <span>${tile.label}</span>
+  `;
+  div.onclick = () => showTileDetails(tile, activeContainer);
+
+  return div;
+}
+
+function renderTiles(target) {
+  target.innerHTML = '';
+  tiles.forEach(tile => {
+    target.appendChild(createTileElement(tile, target));
+  });
+}
+
+function showCatalogMessage(target, text, type = '') {
+  const message = document.createElement('div');
+  message.className = `catalog-message ${type}`.trim();
+  message.textContent = text;
+  target.appendChild(message);
+}
+
+async function initializeCatalog() {
+  try {
+    const bearingCatalog = await loadBearingCatalog();
+    bearingDetails = bearingCatalog.details;
+    tiles = [...staticTiles, ...bearingCatalog.tiles];
+
+    renderTiles(container);
+
+    if (bearingCatalog.tiles.length === 0) {
+      showCatalogMessage(container, 'У файлі source/bearings.xlsx не знайдено значень у стовпці M.', 'error');
+    }
+  } catch (error) {
+    console.error(error);
+    tiles = [...staticTiles];
+    bearingDetails = {};
+
+    renderTiles(container);
+    showCatalogMessage(
+      container,
+      'Не вдалося завантажити source/bearings.xlsx. Відкрийте сторінку через локальний сервер і перевірте, що файл існує в папці source.',
+      'error'
+    );
+  }
+}
+
+backButton.onclick = () => {
+  sidePanel.style.display = 'none';
+  if (resultsContainer) resultsContainer.style.display = 'none';
+
+  if (!container || !document.getElementById('tileSection')) {
+    container = document.querySelector('.catalog-content .tile-container') || (function() {
+      const newContainer = document.createElement('section');
+      newContainer.className = 'tile-container';
+      newContainer.id = 'tileSection';
+      document.querySelector('.catalog-content').appendChild(newContainer);
+      return newContainer;
+    })();
+  }
+
+  container.style.display = 'grid';
+  renderTiles(container);
+};
+
+function ensureXLSXAndInit() {
+  function doInitWhenReady() {
+    if (window.XLSX) return initializeCatalog();
+
+    const existing = Array.from(document.getElementsByTagName('script')).find(s => s.src && s.src.indexOf('xlsx.full.min.js') !== -1);
+    if (existing) {
+      if (existing.getAttribute('data-xlsx-ready') === '1') return initializeCatalog();
+      existing.addEventListener('load', () => {
+        existing.setAttribute('data-xlsx-ready', '1');
+        initializeCatalog();
+      });
+      setTimeout(() => { if (window.XLSX) initializeCatalog(); }, 50);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'scripts/xlsx.full.min.js';
+    script.async = false;
+    script.addEventListener('load', () => {
+      script.setAttribute('data-xlsx-ready', '1');
+      initializeCatalog();
+    });
+    script.addEventListener('error', () => {
+      console.error('Failed to load xlsx.full.min.js');
+      initializeCatalog();
+    });
+    document.head.appendChild(script);
+  }
+  doInitWhenReady();
+}
+
+ensureXLSXAndInit();
+  </script>
+</body>
+</html>
