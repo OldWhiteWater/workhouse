@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Каталог освітлення</title>
+  <title>Каталог підшипників</title>
   <style>
 body {
   margin: 0;
@@ -91,7 +91,7 @@ section.tile-container {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 180px;
+  min-height: 190px;
   box-sizing: border-box;
 }
 
@@ -101,7 +101,8 @@ section.tile-container {
   border-color: #cbd5e1;
 }
 
-.tile img {
+/* Підтримка як картинок, так і вбудованих SVG-іконок */
+.tile img, .tile svg {
   width: 84px;
   height: 84px;
   object-fit: cover;
@@ -247,7 +248,6 @@ section.tile-container {
   letter-spacing: 0.01em;
 }
 
-/* --- DETAILS & SUMMARY FIXED CHEVRON BUG --- */
 details {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -489,7 +489,6 @@ details label:hover {
   color: #c2410c;
 }
 
-/* --- ADDITIONS FOR INSTANT SEARCH & PAGINATION --- */
 .search-container {
   margin-bottom: 20px;
   width: 100%;
@@ -541,6 +540,132 @@ details label:hover {
 .load-more-button:active {
   transform: translateY(0);
 }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-box {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.22);
+  max-width: 660px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 36px 32px 28px;
+  box-sizing: border-box;
+  position: relative;
+  animation: modal-in 0.18s ease;
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.modal-close {
+  position: absolute;
+  top: 16px; right: 20px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #64748b;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.modal-close:hover { background: #e2e8f0; color: #0f172a; }
+
+/* СТИЛІ ДЛЯ ЗОБРАЖЕННЯ ТА ШАПКИ МОДАЛКИ */
+.modal-header-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-bottom: 22px;
+  align-items: flex-start;
+}
+.modal-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+.modal-header-text {
+  flex: 1;
+  min-width: 0;
+}
+.modal-header-container.no-image {
+  display: block;
+}
+.modal-header-container.no-image .modal-product-name {
+  padding-right: 36px;
+}
+
+.modal-product-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+  margin: 0 0 22px 0;
+  padding-right: 36px;
+}
+.modal-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #94a3b8;
+  margin: 0 0 10px 0;
+}
+.modal-section {
+  margin-bottom: 22px;
+}
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.modal-row:last-child { border-bottom: none; }
+.modal-label {
+  font-size: 13px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+.modal-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+  word-break: break-word;
+}
+.modal-value.empty { color: #cbd5e1; font-weight: 400; font-style: italic; }
+.modal-divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 6px 0 22px;
+}
+
+/* карточка — кликабельная, без тегов */
+.product-card { cursor: pointer; }
 
 @media (max-width: 768px) {
   main {
@@ -629,12 +754,23 @@ details label:hover {
     border-top: 1px solid #f1f5f9;
   }
 }
+
+@media (max-width: 480px) {
+  .modal-header-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-image {
+    width: 100px;
+    height: 100px;
+  }
+}
 </style>
 </head>
 <body>
 
   <header>
-    <img src="images/header-image.jpg" alt="Заголовок сайту" />
+    <img src="images/header-image.jpg" alt="Заголовок сайту" onerror="this.style.display='none'" />
   </header>
 
   <main>
@@ -652,101 +788,35 @@ details label:hover {
     </div>
   </main>
 
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox">
+      <button class="modal-close" id="modalClose" title="Закрити">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
   <footer>
-    <img src="images/footer-image.jpg" alt="Футер сайту" />
+    <img src="images/footer-image.jpg" alt="Футер сайту" onerror="this.style.display='none'" />
   </footer>
 
   <script src="scripts/xlsx.full.min.js"></script>
   <script>
-const staticTiles = [
-  {
-    img: 'img1.jpg',
-    label: 'Ліхтарі габаритні та декоративного освітлення',
-    items: ['Світлодіодні стрічки', 'Габаритні ліхтарі', 'Декоративні елементи']
-  },
-  {
-    img: 'img2.jpg',
-    label: 'Лампи побутові та промислові',
-    items: ['LED лампи', 'Галогенні', 'Люмінесцентні']
-  },
-  {
-    img: 'img3.jpg',
-    label: 'Сигнальні вогні та підсвічування номерного знаку',
-    items: ['Лампи номерного знаку', 'Сигнальні вогні']
-  },
-  {
-    img: 'img4.jpg',
-    label: 'Лампи автомобільні',
-    items: ['Ближнє світло', 'Дальнє світло', 'Поворотники']
-  },
-  {
-    img: 'img5.jpg',
-    label: 'Фари головного освітлення та передні протитуманні',
-    items: ['Головні фари', 'Протитуманні фари']
-  },
-  {
-    img: 'img6.jpg',
-    label: 'Додаткові фари та ліхтарі',
-    items: ['Робочі фари', 'Бокові ліхтарі']
-  },
-  {
-    img: 'img7.jpg',
-    label: 'Проблискові маяки, шашки таксі',
-    items: ['Маяки', 'Таксі-шашки']
-  },
-  {
-    img: 'img8.jpg',
-    label: 'Патрони та роз\'єми для ламп, фар, ліхтарів',
-    items: ['Патрони', 'Роз\'єми', 'Перехідники']
-  },
-  {
-    img: 'img9.jpg',
-    label: 'Освітлення внутрішнього простору ТЗ',
-    items: ['Плафони', 'Підсвічування салону']
-  },
-  {
-    img: 'img10.jpg',
-    label: 'Інтер\'єрні світильники',
-    items: ['Настінні', 'Декоративні', 'Точкові']
-  },
-  {
-    img: 'img11.jpg',
-    label: 'Ліхтарі, лампи портативні та переносні',
-    items: ['Акумуляторні', 'Переноски', 'Ручні ліхтарі']
-  },
-  {
-    img: 'img12.jpg',
-    label: 'Ліхтарі екстер\'єрні',
-    items: ['Фасадні', 'Прожектори']
-  },
-  {
-    img: 'img13.jpg',
-    label: 'Захисні решітки для фар та ліхтарів',
-    items: ['Решітки', 'Захисні накладки']
-  }
-];
-
-const lampDetails = {
-  'Тип цоколя': ['A60', 'A65', 'A70', 'C37', 'E40'],
-  'Номінальна потужність, Вт': ['5', '7', '8', '10', '15', '18'],
-  'Температура світла, К': ['3000k', '4100k', '5000k', '6500k'],
-  'Світловий потік, Lm': ['400', '520', '600', '800', '1000']
-};
+const staticTiles = [];
 
 const XLSX_PATH = './source/bearings.xlsx';
 const COLUMN = {
-  a: 0,
-  b: 1,
-  c: 2,
-  d: 3,
-  e: 4,
-  f: 5,
-  m: 12
+  a: 0, b: 1, c: 2,
+  d: 3, e: 4, f: 5,
+  g: 6, h: 7, i: 8, j: 9, k: 10, l: 11,
+  m: 12,
+  v: 21 // Стовпець V (22-й стовпець, індекс 21)
 };
 
 const DISPLAY_COLUMNS = [COLUMN.a, COLUMN.b, COLUMN.c];
-const FILTER_COLUMNS = [COLUMN.d, COLUMN.e, COLUMN.f];
+const FILTER_COLUMNS  = [COLUMN.d, COLUMN.e, COLUMN.f];
+const EXTRA_COLUMNS   = [COLUMN.g, COLUMN.h, COLUMN.i, COLUMN.j, COLUMN.k, COLUMN.l];
 
+let allHeaders = [];
 let tiles = [...staticTiles];
 let bearingDetails = {};
 
@@ -765,6 +835,69 @@ function normalizeCell(value) {
   return String(value).trim();
 }
 
+/**
+ * Генерує формальну векторну (SVG) іконку на основі назви категорії
+ */
+function getCategoryIcon(categoryName) {
+  const label = categoryName.trim().toLowerCase();
+
+  // 1. Кулькові підшипники
+  if (label.includes('кульков')) {
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#0f172a" stroke-width="4"/>
+      <circle cx="50" cy="50" r="24" fill="none" stroke="#0f172a" stroke-width="4"/>
+      <circle cx="50" cy="13" r="6" fill="#475569"/>
+      <circle cx="50" cy="87" r="6" fill="#475569"/>
+      <circle cx="13" cy="50" r="6" fill="#475569"/>
+      <circle cx="87" cy="50" r="6" fill="#475569"/>
+      <circle cx="24" cy="24" r="6" fill="#475569"/>
+      <circle cx="76" cy="24" r="6" fill="#475569"/>
+      <circle cx="24" cy="76" r="6" fill="#475569"/>
+      <circle cx="76" cy="76" r="6" fill="#475569"/>
+    </svg>`;
+  }
+
+  // 2. Роликові циліндричні
+  if (label.includes('роликов') && label.includes('циліндр')) {
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#0f172a" stroke-width="4"/>
+      <circle cx="50" cy="50" r="24" fill="none" stroke="#0f172a" stroke-width="4"/>
+      <rect x="45" y="7" width="10" height="12" rx="1" fill="#475569"/>
+      <rect x="45" y="81" width="10" height="12" rx="1" fill="#475569"/>
+      <rect x="7" y="45" width="12" height="10" rx="1" fill="#475569"/>
+      <rect x="81" y="45" width="12" height="10" rx="1" fill="#475569"/>
+      <g transform="rotate(45 50 50)">
+        <rect x="45" y="7" width="10" height="12" rx="1" fill="#475569"/>
+        <rect x="45" y="81" width="10" height="12" rx="1" fill="#475569"/>
+        <rect x="7" y="45" width="12" height="10" rx="1" fill="#475569"/>
+        <rect x="81" y="45" width="12" height="10" rx="1" fill="#475569"/>
+      </g>
+    </svg>`;
+  }
+
+  // 3. Роликові конічні
+  if (label.includes('роликов') && label.includes('коніч')) {
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#0f172a" stroke-width="4"/>
+      <circle cx="50" cy="50" r="22" fill="none" stroke="#0f172a" stroke-width="3"/>
+      <polygon points="44,7 56,7 53,17 47,17" fill="#475569"/>
+      <g transform="rotate(45 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+      <g transform="rotate(90 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+      <g transform="rotate(135 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+      <g transform="rotate(180 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+      <g transform="rotate(225 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+      <g transform="rotate(270 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+      <g transform="rotate(315 50 50)"><polygon points="44,7 56,7 53,17 47,17" fill="#475569"/></g>
+    </svg>`;
+  }
+
+  // Універсальна інженерна заглушка для інших категорій
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="4 4"/>
+    <path d="M30 50 H70 M50 30 V70" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+  </svg>`;
+}
+
 function sortValues(values) {
   return [...values].sort((a, b) => {
     const first = Number(String(a).replace(',', '.'));
@@ -777,36 +910,12 @@ function sortValues(values) {
   });
 }
 
-const filterValueColorMap = new Map();
-
-function getColorPalette() {
-  return [
-    { bg: '#fef3c7', border: '#fcd34d', text: '#b45309' },
-    { bg: '#dbeafe', border: '#bfdbfe', text: '#1e40af' },
-    { bg: '#e0e7ff', border: '#c7d2fe', text: '#4f46e5' },
-    { bg: '#fce7f3', border: '#fbcfe8', text: '#be185d' },
-    { bg: '#f0fdf4', border: '#bbf7d0', text: '#166534' },
-    { bg: '#fef2f2', border: '#fee2e2', text: '#b91c1c' },
-    { bg: '#fefce8', border: '#fef08a', text: '#854d0e' },
-    { bg: '#f5f3ff', border: '#ede9fe', text: '#5b21b6' },
-    { bg: '#f0fdfa', border: '#ccfbf1', text: '#0d9488' },
-    { bg: '#ecfdf5', border: '#d1fae5', text: '#047857' }
-  ];
-}
-
-function getColorForValue(value) {
-  if (!filterValueColorMap.has(value)) {
-    const palette = getColorPalette();
-    const index = filterValueColorMap.size % palette.length;
-    filterValueColorMap.set(value, palette[index]);
-  }
-  return filterValueColorMap.get(value);
-}
-
 function buildBearingCatalog(rows) {
   const header = rows[0] || [];
-  const displayHeaders = DISPLAY_COLUMNS.map(index => normalizeCell(header[index]) || `Стовпець ${String.fromCharCode(65 + index)}`);
-  const filterHeaders = FILTER_COLUMNS.map(index => normalizeCell(header[index]) || `Стовpeць ${String.fromCharCode(65 + index)}`);
+  allHeaders = header.map((h, i) => normalizeCell(h) || String.fromCharCode(65 + i));
+  while (allHeaders.length <= COLUMN.l) allHeaders.push(String.fromCharCode(65 + allHeaders.length));
+  const displayHeaders = DISPLAY_COLUMNS.map(index => allHeaders[index]);
+  const filterHeaders  = FILTER_COLUMNS.map(index => allHeaders[index]);
 
   const categoryRows = {};
   const details = {};
@@ -894,7 +1003,7 @@ async function loadBearingCatalog() {
       console.debug('Read sheet:', name, 'rows:', sheetRows.length);
       const normalized = sheetRows.slice(1).map(r => {
         const row = Array.isArray(r) ? r.slice() : [];
-        while (row.length <= COLUMN.m) row.push('');
+        while (row.length <= COLUMN.v) row.push(''); // Змінено з m на v, щоб не обрізати масив рядка
         return row;
       });
       allRows.push(...normalized);
@@ -907,7 +1016,7 @@ async function loadBearingCatalog() {
     console.debug('Fallback read first sheet:', workbook.SheetNames[0], 'rows:', sheetRows.length);
     const normalized = sheetRows.slice(1).map(r => {
       const row = Array.isArray(r) ? r.slice() : [];
-      while (row.length <= COLUMN.m) row.push('');
+      while (row.length <= COLUMN.v) row.push(''); // Змінено з m на v
       return row;
     });
     allRows.push(...normalized);
@@ -917,51 +1026,12 @@ async function loadBearingCatalog() {
     ? (() => {
         const firstSheetRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '', blankrows: false });
         const row = Array.isArray(firstSheetRows[0]) ? firstSheetRows[0].slice() : [];
-        while (row.length <= COLUMN.m) row.push('');
+        while (row.length <= COLUMN.v) row.push(''); // Змінено з m на v
         return row;
       })()
     : [];
 
   return buildBearingCatalog([headerRow, ...allRows]);
-}
-
-function appendDetailGroups(target, detailGroups, withCheckboxes = true) {
-  for (const [group, values] of Object.entries(detailGroups)) {
-    const details = document.createElement('details');
-    const summary = document.createElement('summary');
-    summary.textContent = group;
-    details.appendChild(summary);
-
-    const ul = document.createElement('ul');
-    ul.style.paddingLeft = '20px';
-    ul.style.listStyle = 'none';
-
-    values.forEach(val => {
-      const li = document.createElement('li');
-
-      if (withCheckboxes) {
-        const label = document.createElement('label');
-        label.style.cursor = 'pointer';
-        label.style.display = 'block';
-        label.style.marginBottom = '5px';
-
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = val;
-        checkbox.style.marginRight = '8px';
-
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(val));
-        li.appendChild(label);
-      } else {
-        li.textContent = val;
-      }
-      ul.appendChild(li);
-    });
-
-    details.appendChild(ul);
-    target.appendChild(details);
-  }
 }
 
 function renderDisplayValues(resultContainer, filteredData) {
@@ -1009,23 +1079,88 @@ function renderDisplayValues(resultContainer, filteredData) {
     header.appendChild(specsBox);
     card.appendChild(header);
 
-    const filtersDiv = document.createElement('div');
-    filtersDiv.className = 'card-filters';
-    
-    filteredData.filterHeaders.forEach((headerName, index) => {
-      const filterValue = normalizeCell(row[FILTER_COLUMNS[index]]);
-      if (filterValue) {
-        const filterTag = document.createElement('span');
-        filterTag.className = 'filter-tag';
-        filterTag.textContent = `${headerName}: ${filterValue}`;
-        filtersDiv.appendChild(filterTag);
-      }
-    });
-    
-    card.appendChild(filtersDiv);
+    card.addEventListener('click', () => openModal(row));
     resultContainer.appendChild(card);
   });
 }
+
+// ---- MODAL ----
+const modalOverlay = document.getElementById('modalOverlay');
+const modalContent = document.getElementById('modalContent');
+const modalClose   = document.getElementById('modalClose');
+
+function openModal(row) {
+  const v = (idx) => normalizeCell(row[idx]);
+  const imageName = v(COLUMN.v); // Отримуємо назву зображення зі стовпця V
+
+  let html = '';
+
+  // Перевіряємо, чи вказано ім'я зображення у таблиці
+  if (imageName) {
+    html += `
+      <div class="modal-header-container">
+        <img src="images/${imageName}" class="modal-image" alt="${v(COLUMN.c) || 'Підшипник'}" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
+        <div class="modal-header-text">
+          <p class="modal-product-name" style="margin-bottom: 0;">${v(COLUMN.c) || 'Без назви'}</p>
+        </div>
+      </div>
+    `;
+  } else {
+    html += `<p class="modal-product-name">${v(COLUMN.c) || 'Без назви'}</p>`;
+  }
+
+  html += `<div class="modal-section">
+    <p class="modal-section-title">Ідентифікація</p>`;
+  [[COLUMN.b, allHeaders[COLUMN.b]], [COLUMN.a, allHeaders[COLUMN.a]]].forEach(([idx, lbl]) => {
+    const val = v(idx);
+    html += `<div class="modal-row">
+      <span class="modal-label">${lbl}</span>
+      <span class="modal-value${val ? '' : ' empty'}">${val || '—'}</span>
+    </div>`;
+  });
+  html += `</div><hr class="modal-divider">`;
+
+  const hasB2 = FILTER_COLUMNS.some(i => v(i) !== '');
+  if (hasB2) {
+    html += `<div class="modal-section">
+      <p class="modal-section-title">Розміри</p>`;
+    FILTER_COLUMNS.forEach(idx => {
+      const val = v(idx);
+      html += `<div class="modal-row">
+        <span class="modal-label">${allHeaders[idx]}</span>
+        <span class="modal-value${val ? '' : ' empty'}">${val || '—'}</span>
+      </div>`;
+    });
+    html += `</div><hr class="modal-divider">`;
+  }
+
+  const hasB3 = EXTRA_COLUMNS.some(i => v(i) !== '');
+  if (hasB3) {
+    html += `<div class="modal-section">
+      <p class="modal-section-title">Технічні характеристики</p>`;
+    EXTRA_COLUMNS.forEach(idx => {
+      const val = v(idx);
+      html += `<div class="modal-row">
+        <span class="modal-label">${allHeaders[idx]}</span>
+        <span class="modal-value${val ? '' : ' empty'}">${val || '—'}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  modalContent.innerHTML = html;
+  modalOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 function getSelectedFilters(filterPanel) {
   const filters = {};
@@ -1332,10 +1467,6 @@ function showTileDetails(tile, activeContainer) {
     sideList.appendChild(itemsUl);
   }
 
-  if (tile.label === 'Лампи побутові та промислові') {
-    appendDetailGroups(sideList, lampDetails);
-  }
-
   if (bearingDetails[tile.label]) {
     renderCategoryDetails(bearingDetails[tile.label]);
   }
@@ -1345,9 +1476,13 @@ function showTileDetails(tile, activeContainer) {
 
 function createTileElement(tile, activeContainer) {
   const div = document.createElement('div');
-  div.className = tile.img ? 'tile' : 'tile no-image';
+  div.className = 'tile';
+  
+  // Отримуємо векторну іконку замість картинки з папки images
+  const iconSvg = getCategoryIcon(tile.label);
+
   div.innerHTML = `
-    ${tile.img ? `<img src="images/${tile.img}" alt="${tile.label}" />` : ''}
+    ${iconSvg}
     <span>${tile.label}</span>
   `;
   div.onclick = () => showTileDetails(tile, activeContainer);
@@ -1373,10 +1508,7 @@ async function initializeCatalog() {
   try {
     const bearingCatalog = await loadBearingCatalog();
     bearingDetails = bearingCatalog.details;
-    
-    // Видаляємо останні 3 плитки без малюнків (отримані з файлу bearings.xlsx)
-    const dynamicTiles = bearingCatalog.tiles.slice(0, -3);
-    tiles = [...staticTiles, ...dynamicTiles];
+    tiles = [...staticTiles, ...bearingCatalog.tiles];
 
     renderTiles(container);
 

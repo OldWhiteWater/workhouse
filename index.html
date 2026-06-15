@@ -13,6 +13,49 @@
 
 <body>
 
+  <nav style="
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    font-family: sans-serif;
+    font-size: 14px;
+  ">
+    <a href="index.html" style="
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #fff;
+      background: #1a73e8;
+      font-weight: 600;
+      pointer-events: none;
+    " aria-current="page">Головна</a>
+    <a href="catalog.html" style="
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #1a73e8;
+      background: transparent;
+      transition: background 0.15s;
+    " onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='transparent'">Каталог</a>
+    <a href="diagram.html" style="
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #1a73e8;
+      background: transparent;
+    " onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='transparent'">Діаграма</a>
+    <a href="bearings.html" style="
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #1a73e8;
+      background: transparent;
+    " onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='transparent'">Підшипники</a>
+  </nav>
+
   <h2>Каталог товарів</h2>
 
   <!-- Контейнер для імпортованого дерева -->
