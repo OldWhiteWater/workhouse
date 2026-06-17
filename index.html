@@ -2,74 +2,32 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Інтерактивне дерево товарів</title>
-
-  <!-- Підключення зовнішніх стилів -->
   <link rel="stylesheet" href="styles/style.css">
-
-  <!-- SheetJS для роботи з Excel -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
-
 <body>
 
-  <nav style="
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #f5f5f5;
-    border-bottom: 1px solid #ddd;
-    font-family: sans-serif;
-    font-size: 14px;
-  ">
-    <a href="index.html" style="
-      padding: 6px 14px;
-      border-radius: 4px;
-      text-decoration: none;
-      color: #fff;
-      background: #1a73e8;
-      font-weight: 600;
-      pointer-events: none;
-    " aria-current="page">Головна</a>
-    <a href="catalog.html" style="
-      padding: 6px 14px;
-      border-radius: 4px;
-      text-decoration: none;
-      color: #1a73e8;
-      background: transparent;
-      transition: background 0.15s;
-    " onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='transparent'">Каталог</a>
-    <a href="diagram.html" style="
-      padding: 6px 14px;
-      border-radius: 4px;
-      text-decoration: none;
-      color: #1a73e8;
-      background: transparent;
-    " onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='transparent'">Діаграма</a>
-    <a href="bearings.html" style="
-      padding: 6px 14px;
-      border-radius: 4px;
-      text-decoration: none;
-      color: #1a73e8;
-      background: transparent;
-    " onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='transparent'">Підшипники</a>
-  </nav>
+  <header class="site-header">
+    <nav class="nav-container">
+      <a href="index.html" class="nav-link" aria-current="page">Головна</a>
+      <a href="catalog.html" class="nav-link">Каталог</a>
+      <a href="diagram.html" class="nav-link">Діаграма</a>
+      <a href="bearings.html" class="nav-link">Підшипники</a>
+    </nav>
+  </header>
 
-  <h2>Каталог товарів</h2>
+  <main class="main-content">
+    <h1 class="page-title">Каталог товарів</h1>
+    <div id="importedTree">Завантаження каталогу...</div>
+  </main>
 
-  <!-- Контейнер для імпортованого дерева -->
-  <div id="importedTree" style="margin-top: 20px;"></div>
-
-  <!-- Основний JS -->
   <script src="scripts/main.js"></script>
-
-  <!-- Автоматичний запуск імпорту -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       importTreeFromExcel();
     });
   </script>
-
 </body>
 </html>
