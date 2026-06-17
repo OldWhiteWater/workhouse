@@ -1,124 +1,42 @@
-body {
-  font-family: "Segoe UI", sans-serif;
-  background-color: #f4f6f8;
-  margin: 0;
-  padding: 20px;
+:root {
+  --primary: #1a73e8;
+  --bg-hover: #e8f0fe;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border: #e2e8f0;
+  --radius: 8px;
 }
 
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
-}
+body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: var(--text-main); margin: 0; }
 
-ul {
-  list-style-type: none;
-  padding-left: 20px;
-}
+.site-header { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+.nav-container { max-width: 1200px; margin: 0 auto; display: flex; gap: 8px; padding: 12px 24px; }
+.nav-link { padding: 8px 16px; border-radius: var(--radius); text-decoration: none; color: var(--text-muted); font-weight: 500; }
+.nav-link[aria-current="page"] { background: var(--primary); color: #fff; }
 
-li {
-  margin: 6px 0;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-}
+.main-content { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+.page-title { font-size: 32px; margin-bottom: 24px; }
 
-li:hover {
-  background-color: #e0e7ff;
-}
-
-.nested {
-  display: none;
-  margin-left: 10px;
-  border-left: 2px dashed #ccc;
-  padding-left: 10px;
-}
-
-.active {
-  display: block;
-}
+#importedTree ul { list-style: none; padding-left: 20px; }
+.tree-node { margin: 4px 0; }
 
 .caret {
-  cursor: pointer;
-  user-select: none;
-  font-weight: 600;
-  color: #2c3e50;
-  display: inline-block;
-  padding: 4px 6px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  cursor: pointer; display: flex; align-items: center; padding: 8px 12px;
+  border-radius: var(--radius); transition: background 0.2s; user-select: none;
 }
-
-.caret:hover {
-  background-color: #dfe6e9;
-}
+.caret:hover { background: var(--bg-hover); color: var(--primary); }
 
 .caret::before {
-  content: "▶";
-  color: #2980b9;
-  display: inline-block;
-  margin-right: 6px;
-  transition: transform 0.2s ease;
+  content: "▶"; font-size: 10px; margin-right: 8px; transition: transform 0.2s; color: var(--text-muted);
 }
+.caret-down::before { transform: rotate(90deg); color: var(--primary); }
 
-.caret-down::before {
-  content: "▼";
+.nested {
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  border-left: 1px solid var(--border); margin-left: 10px;
 }
+.nested.active { max-height: 2000px; opacity: 1; }
 
-/* Подсветка при наведении */
-#importedTree li:hover {
-  background-color: #eef4ff;
-  border-radius: 4px;
-}
-
-/* Активный элемент (кликнутый) */
-.active-item {
-  background-color: #dce7ff;
-  border-radius: 4px;
-  font-weight: 600;
-  color: #1a3d7c;
-}
-
-/* Плавная анимация */
-#importedTree li {
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-/* ✅ Адаптивность для телефонов */
-@media (max-width: 600px) {
-  body {
-    padding: 10px;
-    font-size: 15px;
-  }
-
-  h2 {
-    font-size: 18px;
-    margin-bottom: 12px;
-  }
-
-  ul {
-    padding-left: 12px;
-  }
-
-  li {
-    margin: 4px 0;
-    padding: 6px;
-    font-size: 15px;
-  }
-
-  .caret {
-    font-size: 15px;
-    padding: 6px;
-  }
-
-  .caret::before {
-    font-size: 16px;
-    margin-right: 4px;
-  }
-
-  .nested {
-    margin-left: 6px;
-    padding-left: 6px;
-    border-left: 1px dashed #bbb; /* тоньше линия */
-  }
-}
+.leaf { padding: 8px 12px; color: var(--text-muted); font-size: 0.95em; }
+.active-item { background: #dce7ff !important; font-weight: 600; color: #1a3d7c; border-radius: 4px; }
