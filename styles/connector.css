@@ -103,6 +103,99 @@ section.tile-container {
   border-radius: 12px;
 }
 
+/* Екран 1 (Родитель): 2 колонки, 75% ширини екрана, великі картинки
+   у пропорції вихідного зображення 871x528 замість дрібної іконки 84x84 */
+section.tile-container.parent-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 75%;
+  margin: 0 auto;
+  gap: 28px;
+}
+
+.tile.tile-parent {
+  padding: 20px;
+  min-height: unset;
+}
+
+.tile.tile-parent img,
+.tile.tile-parent svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 871 / 528;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
+
+.tile.tile-parent span:first-of-type {
+  font-size: 18px;
+}
+
+@media (max-width: 900px) {
+  section.tile-container.parent-grid {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+}
+
+/* Екрани 2 і 3 (группа1 / группа2): 6 колонок по довжині, картинки більші
+   за базову іконку 84x84, але не на всю ширину екрана, як у Родителя */
+section.tile-container.grid-6col {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+.tile.tile-medium {
+  padding: 16px 12px;
+  min-height: unset;
+}
+
+.tile.tile-medium img,
+.tile.tile-medium svg {
+  width: 100%;
+  height: auto;
+  min-height: 110px;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+@media (max-width: 1400px) {
+  section.tile-container.grid-6col { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 900px) {
+  section.tile-container.grid-6col { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  section.tile-container.grid-6col { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Екран 4 (інфо-сторінка группа3): інформаційний блок займає 70% ширини */
+.group3-detail-box {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  width: 70%;
+  margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.group3-detail-image {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .group3-detail-box {
+    width: 92%;
+  }
+}
+
 .tile span {
   display: block;
   font-weight: 600;
