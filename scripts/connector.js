@@ -38,7 +38,46 @@ const PROPERTIES_FIELD = 'Свойства';
 const GROUP_KEY_FIELD_PRIMARY  = 'Номер группы ch3';
 const GROUP_KEY_FIELD_FALLBACK = 'Номер группы ch2';
 
-const FILTER_FIELDS = ['Материал корпуса', 'Геометрия', 'Типы портов', 'Конструктивные признаки'];
+const FILTER_FIELDS = ['Диаметр трубки, мм', 'Диаметр резьбы', 'Материал корпуса', 'Геометрия', 'Типы портов', 'Конструктивные признаки'];
+
+// Деякі фільтри збираються не з однієї колонки, а з декількох "Порт N ..."
+// одразу (наприклад діаметр трубки є в кожного порту окремо). Для таких
+// фільтрів рядок вважається таким, що має значення V, якщо V зустрічається
+// хоча б в одному з портів цього рядка.
+const VIRTUAL_FILTER_COLUMN_PATTERNS = {
+  'Диаметр трубки, мм': /^Порт \d+ диаметр трубки, мм$/i,
+  'Диаметр резьбы': /^Порт \d+ диаметр резьбы$/i
+};
+
+// Повертає МАСИВ значень поля для рядка (для звичайних полів — 0 або 1
+// значення; для віртуальних мультиколонкових фільтрів — усі непорожні
+// значення з відповідних "Порт N ..." колонок цього рядка).
+// Дехто зберігає числові значення як "8", дехто як "8.0" — без нормалізації
+// це створило б два різних чекбокси для того самого діаметра.
+function normalizeNumericToken(v) {
+  if (v === '') return v;
+  const n = Number(v.replace(',', '.'));
+  if (!Number.isNaN(n) && /^-?\d+([.,]\d+)?$/.test(v)) {
+    return String(n);
+  }
+  return v;
+}
+
+function getFieldValuesForRow(fieldName, row) {
+  const pattern = VIRTUAL_FILTER_COLUMN_PATTERNS[fieldName];
+  if (pattern) {
+    const values = new Set();
+    allHeaders.forEach(h => {
+      if (pattern.test(h)) {
+        const v = normalizeNumericToken(cell(row, h));
+        if (v) values.add(v);
+      }
+    });
+    return [...values];
+  }
+  const v = cell(row, fieldName);
+  return v ? [v] : [];
+}
 
 const OVERVIEW_FIELDS = [
   'Вид изделия', 'Среда применения', 'Материал корпуса',
@@ -121,10 +160,18 @@ function resolveGroupKeyField() {
   return null;
 }
 
+function parseNumericLike(v) {
+  const s = String(v).trim().replace(',', '.');
+  if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+  const fracMatch = s.match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (fracMatch) return Number(fracMatch[1]) / Number(fracMatch[2]);
+  return NaN;
+}
+
 function sortValues(values) {
   return [...values].sort((a, b) => {
-    const first = Number(String(a).replace(',', '.'));
-    const second = Number(String(b).replace(',', '.'));
+    const first = parseNumericLike(a);
+    const second = parseNumericLike(b);
     if (!Number.isNaN(first) && !Number.isNaN(second)) return first - second;
     return String(a).localeCompare(String(b), 'uk');
   });
@@ -218,7 +265,11 @@ function distinctValuesWithSample(rows, field) {
 
 function tileImageHtml(imageSrc, altText, fallbackHtml) {
   if (!imageSrc) return fallbackHtml;
-  return `<img src="images/${imageSrc}" alt="${altText}" onerror="this.outerHTML = ${JSON.stringify(fallbackHtml)};">`;
+  // ВАЖЛИВО: onerror обгорнуто в ОДИНАРНІ лапки, бо JSON.stringify()
+  // повертає рядок у ПОДВІЙНИХ лапках — якщо атрибут теж у подвійних,
+  // HTML-парсер обриває атрибут на першій внутрішній лапці і "хвіст"
+  // SVG/тексту витікає як видимий вміст плитки (саме цей баг був помічений).
+  return `<img src="images/${imageSrc}" alt="${altText}" onerror='console.warn("Не вдалося завантажити зображення:", this.src); this.outerHTML = ${JSON.stringify(fallbackHtml)};'>`;
 }
 
 function renderBreadcrumbs(target) {
@@ -282,7 +333,8 @@ function renderLevelTiles(levelIndex) {
   container.appendChild(wrap);
 
   const grid = document.createElement('section');
-  grid.className = 'tile-container';
+  const gridClassByLevel = ['tile-container parent-grid', 'tile-container grid-6col', 'tile-container grid-6col'];
+  grid.className = gridClassByLevel[levelIndex] || 'tile-container';
   container.appendChild(grid);
 
   const levelDef = HIERARCHY[levelIndex];
@@ -296,7 +348,8 @@ function renderLevelTiles(levelIndex) {
 
   [...valueMap.entries()].sort((a, b) => a[0].localeCompare(b[0], 'uk')).forEach(([value, info]) => {
     const div = document.createElement('div');
-    div.className = 'tile';
+    const tileClassByLevel = ['tile tile-parent', 'tile tile-medium', 'tile tile-medium'];
+    div.className = tileClassByLevel[levelIndex] || 'tile';
 
     let imageSrc = '';
     if (levelDef.imageOwn) {
@@ -355,11 +408,11 @@ function renderGroup3Detail(group3Value, sampleRow, scopeRows) {
   const description = sampleRow ? cell(sampleRow, GROUP3_DESCRIPTION) : '';
 
   const box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;max-width:720px;margin:0 auto;box-shadow:0 1px 3px rgba(0,0,0,0.05);';
+  box.className = 'group3-detail-box';
 
   let html = '';
   if (bigImage) {
-    html += `<img src="images/${bigImage}" alt="${group3Value}" style="width:100%;max-height:320px;object-fit:contain;border-radius:12px;margin-bottom:20px;" onerror="this.style.display='none';">`;
+    html += `<img src="images/${bigImage}" alt="${group3Value}" class="group3-detail-image" onerror='console.warn("Не вдалося завантажити велике зображення:", this.src); this.style.display="none";'>`;
   }
   html += `<h2 style="margin:0 0 14px 0;font-size:20px;color:#0f172a;">${group3Value}</h2>`;
   if (description) {
@@ -434,8 +487,7 @@ function buildFilterValueSets(rows) {
   FILTER_FIELDS.forEach(f => { sets[f] = new Set(); });
   rows.forEach(row => {
     FILTER_FIELDS.forEach(f => {
-      const v = cell(row, f);
-      if (v) sets[f].add(v);
+      getFieldValuesForRow(f, row).forEach(v => sets[f].add(v));
     });
   });
   const result = {};
@@ -615,7 +667,10 @@ function getSelectedFilters(filterPanel) {
 function getFilteredDisplayValues(categoryDetail, filters) {
   const active = Object.entries(filters).filter(([, v]) => v.length > 0);
   const filteredRows = categoryDetail.rows.filter(row =>
-    active.every(([fieldName, values]) => values.includes(cell(row, fieldName)))
+    active.every(([fieldName, values]) => {
+      const rowValues = getFieldValuesForRow(fieldName, row);
+      return values.some(v => rowValues.includes(v));
+    })
   );
   return { rows: filteredRows };
 }
@@ -623,12 +678,14 @@ function getFilteredDisplayValues(categoryDetail, filters) {
 function getAvailableValuesForGroup(categoryDetail, filters, targetGroup) {
   const otherActive = Object.entries(filters).filter(([g, v]) => g !== targetGroup && v.length > 0);
   const subset = categoryDetail.rows.filter(row =>
-    otherActive.every(([fieldName, values]) => values.includes(cell(row, fieldName)))
+    otherActive.every(([fieldName, values]) => {
+      const rowValues = getFieldValuesForRow(fieldName, row);
+      return values.some(v => rowValues.includes(v));
+    })
   );
   const available = new Set();
   subset.forEach(row => {
-    const v = cell(row, targetGroup);
-    if (v) available.add(v);
+    getFieldValuesForRow(targetGroup, row).forEach(v => available.add(v));
   });
   return available;
 }
@@ -746,7 +803,7 @@ function createFilterSection(categoryDetail, onFilterChange) {
       checkbox.addEventListener('click', e => e.stopPropagation());
       checkbox.addEventListener('change', onFilterChange);
 
-      const count = categoryDetail.rows.filter(row => cell(row, headerName) === value).length;
+      const count = categoryDetail.rows.filter(row => getFieldValuesForRow(headerName, row).includes(value)).length;
 
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(value));
