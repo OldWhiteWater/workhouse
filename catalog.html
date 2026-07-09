@@ -1213,6 +1213,12 @@ function renderCategoryDetails(categoryDetails) {
   let itemsToShow = 12;
   let searchQuery = '';
 
+  resultsContainer.innerHTML = '';
+  resultsContainer.style.display = 'block';
+  catalogToolbar.style.display = 'block';
+  sidePanel.style.display = 'block';
+  sideList.innerHTML = '';
+
   const filterPanel = document.createElement('div');
   filterPanel.style.marginBottom = '22px';
 
@@ -1242,6 +1248,7 @@ function renderCategoryDetails(categoryDetails) {
     const filters = getSelectedFilters(filterPanel);
     const filtered = getFilteredDisplayValues(categoryDetails, filters);
 
+    // Пошук по код/картка/назва
     if (searchQuery) {
       filtered.rows = filtered.rows.filter(row => {
         const kartka = normalizeCell(row[DISPLAY_COLUMNS[0]]).toLowerCase();
@@ -1260,12 +1267,14 @@ function renderCategoryDetails(categoryDetails) {
     });
     updateFilterAvailability(filterPanel, categoryDetails, filters);
 
+    // Відображення карток
     renderDisplayValues(displayValuesContainer, {
       rows: paginatedRows,
       filterHeaders: filtered.filterHeaders,
       displayHeaders: filtered.displayHeaders
     });
 
+    // Лічильник
     if (totalFilteredCount === 0) {
       countLabel.textContent = 'Немає товарів, що відповідають вибраним фільтрам.';
       countLabel.style.color = '#dc2626';
@@ -1274,6 +1283,7 @@ function renderCategoryDetails(categoryDetails) {
       countLabel.style.color = '#64748b';
     }
 
+    // Кнопка "Показати ще"
     let loadMoreBtn = resultsContainer.querySelector('.load-more-container');
     if (loadMoreBtn) loadMoreBtn.remove();
 
@@ -1297,6 +1307,7 @@ function renderCategoryDetails(categoryDetails) {
     updateResults();
   };
 
+  // Створюємо секції фільтрів
   const filtersEl = createFilterSection(categoryDetails, handleFilterChange);
   filterPanel.appendChild(filtersEl);
 
@@ -1308,6 +1319,7 @@ function renderCategoryDetails(categoryDetails) {
   resultsContainer.appendChild(countLabel);
   resultsContainer.appendChild(displayValuesContainer);
 }
+
 
 function showTileDetails(tile, activeContainer) {
   if (activeContainer && activeContainer.style) activeContainer.style.display = 'none';
