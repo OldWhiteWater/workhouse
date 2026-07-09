@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Каталог з'єднувачів</title>
+  <!-- Подключение внешнего CSS -->
+  <link rel="stylesheet" href="styles/connector.css">
+</head>
+<body>
+
+  <header>
+    <img src="images/header-image.jpg" alt="Заголовок сайту" onerror="this.style.display='none'" />
+  </header>
+
+  <main>
+    <aside id="sidePanel">
+      <h3 id="sideTitle">Категорія</h3>
+      <div id="sideList"></div>
+    </aside>
+
+    <div class="catalog-content">
+      <div class="catalog-toolbar" id="catalogToolbar">
+        <button id="backButton" class="back-button" type="button">Назад до категорій</button>
+      </div>
+      <section class="tile-container" id="tileSection"></section>
+      <div id="resultsContainer" class="results-panel" style="display:none;"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox">
+      <button class="modal-close" id="modalClose" title="Закрити">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <footer>
+    <img src="images/footer-image.jpg" alt="Футер сайту" onerror="this.style.display='none'" />
+  </footer>
+
+  <script src="scripts/xlsx.full.min.js"></script>
+  <script src="scripts/connector.js"></script>
+</body>
+</html>
