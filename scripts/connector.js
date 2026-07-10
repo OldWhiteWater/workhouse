@@ -1,11 +1,17 @@
 // =============================================================================
-// Каталог з'єднувачів — 5 екранів навігації:
-//   Екран 1: Родитель (плитки)
-//   Екран 2: группа1 (плитки, в межах обраного Родитель)
-//   Екран 3: группа2 (плитки з картинка_ группа3_small, в межах группа1)
-//   Екран 4: інфо-сторінка группа3 (назва группа3, картинка_ группа3_big,
-//            описание_ группа3, кнопка "Продовжити") — окремого екрану
-//            зі списком плиток "группа3" НЕМАЄ, group2-клік веде відразу сюди
+// Каталог з'єднувачів — 6 екранів навігації:
+//   Екран 1: Родитель (плитки, 2 колонки, 75% ширини)
+//   Екран 2: группа1 (плитки, в межах обраного Родитель, 6 колонок)
+//   Екран 3: группа2 (плитки, в межах группа1, 6 колонок; своєї картинки
+//            немає -> прев'ю бере картинка_ группа3_small довільної дочірньої
+//            группа3, просто щоб плитка не була порожньою)
+//   Екран 3.5: группа3 (плитки з картинка_ группа3_small, в межах группа2,
+//            6 колонок) — ПОВЕРНУВ цей рівень: одна группа2 може містити
+//            КІЛЬКА різних группа3 (перевірено на реальних даних — наприклад
+//            "...пластиковые" містить одразу 3: прямий/кутовий/тристоронній
+//            цанговий, кожен зі своєю парою small/big картинок і описом)
+//   Екран 4: інфо-сторінка обраної группа3 (назва, картинка_ группа3_big,
+//            описание_ группа3, кнопка "Продовжити"), 70% ширини екрана
 //   Екран 5: фінальна вибірка карток (картки/фільтри/пошук/модалка)
 //
 // Назви полів узято ТОЧНО як в реальному файлі (включно з пробілом після "_" —
@@ -17,10 +23,7 @@
 // ПРИПУЩЕННЯ, які варто звірити візуально:
 //   - Фінальна вибірка карток фільтрується за "Номер группы ch3" (з фолбеком
 //     на "Номер группы ch2" для старих файлів); якщо ключ групи порожній —
-//     використовуються всі рядки в межах обраної группа2.
-//   - Якщо жоден рядок в межах группа2 ще не має заповненої "группа3" —
-//     інфо-сторінка показує назву группа2 замість группа3 і напис
-//     "Опис ще не заповнено" замість опису.
+//     використовуються всі рядки в межах обраної группа3.
 // =============================================================================
 
 const staticTiles = [];
@@ -88,9 +91,8 @@ const HIERARCHY = [
   { key: 'parent', field: 'Родитель',  imageOwn: 'картинка_ родитель', label: 'Категорія' },
   { key: 'group1', field: 'группа1',   imageOwn: 'картинка_ группа1',  label: 'Підкатегорія' },
   { key: 'group2', field: 'группа2',   imageOwn: null,                 label: 'Група' },
+  { key: 'group3', field: 'группа3',   imageOwn: 'картинка_ группа3_small', label: 'Виріб' },
 ];
-const GROUP3_FIELD       = 'группа3';
-const GROUP3_IMAGE_SMALL = 'картинка_ группа3_small';
 const GROUP3_IMAGE_BIG   = 'картинка_ группа3_big';
 const GROUP3_DESCRIPTION = 'описание_ группа3';
 
@@ -100,7 +102,7 @@ const HIDDEN_EXTRA_FIELDS_BASE = new Set([
   GROUP_KEY_FIELD_PRIMARY, GROUP_KEY_FIELD_FALLBACK,
   ...OVERVIEW_FIELDS,
   ...HIERARCHY.map(h => h.field), ...HIERARCHY.map(h => h.imageOwn).filter(Boolean),
-  GROUP3_FIELD, GROUP3_IMAGE_SMALL, GROUP3_IMAGE_BIG, GROUP3_DESCRIPTION
+  GROUP3_IMAGE_BIG, GROUP3_DESCRIPTION
 ]);
 
 const HIDDEN_EXTRA_FIELDS = new Set(
@@ -333,7 +335,7 @@ function renderLevelTiles(levelIndex) {
   container.appendChild(wrap);
 
   const grid = document.createElement('section');
-  const gridClassByLevel = ['tile-container parent-grid', 'tile-container grid-6col', 'tile-container grid-6col'];
+  const gridClassByLevel = ['tile-container parent-grid', 'tile-container grid-6col', 'tile-container grid-6col', 'tile-container grid-6col'];
   grid.className = gridClassByLevel[levelIndex] || 'tile-container';
   container.appendChild(grid);
 
@@ -348,20 +350,24 @@ function renderLevelTiles(levelIndex) {
 
   [...valueMap.entries()].sort((a, b) => a[0].localeCompare(b[0], 'uk')).forEach(([value, info]) => {
     const div = document.createElement('div');
-    const tileClassByLevel = ['tile tile-parent', 'tile tile-medium', 'tile tile-medium'];
+    const tileClassByLevel = ['tile tile-parent', 'tile tile-medium', 'tile tile-medium', 'tile tile-medium'];
     div.className = tileClassByLevel[levelIndex] || 'tile';
 
     let imageSrc = '';
     if (levelDef.imageOwn) {
       imageSrc = cell(info.sampleRow, levelDef.imageOwn);
     } else {
-      // group2 (останній рівень): власної картинки немає -> беремо
-      // картинка_ группа3_small з будь-якого рядка цієї группа2, де вона задана
-      const scopeRows = allRows.filter(r =>
-        HIERARCHY.slice(0, levelIndex + 1).every(h => cell(r, h.field) === (h.key === levelDef.key ? value : selection[h.key]))
-      );
-      const withImage = scopeRows.find(r => cell(r, GROUP3_IMAGE_SMALL));
-      if (withImage) imageSrc = cell(withImage, GROUP3_IMAGE_SMALL);
+      // Рівень без власної картинки (наразі це "группа2") -> беремо картинку
+      // власної колонки НАСТУПНОГО рівня з будь-якого дочірнього рядка,
+      // де вона задана (тобто прев'ю однієї з дочірніх "группа3").
+      const nextLevel = HIERARCHY[levelIndex + 1];
+      if (nextLevel && nextLevel.imageOwn) {
+        const scopeRows = allRows.filter(r =>
+          HIERARCHY.slice(0, levelIndex + 1).every(h => cell(r, h.field) === (h.key === levelDef.key ? value : selection[h.key]))
+        );
+        const withImage = scopeRows.find(r => cell(r, nextLevel.imageOwn));
+        if (withImage) imageSrc = cell(withImage, nextLevel.imageOwn);
+      }
     }
 
     const fallback = getCategoryIconFallback(value);
@@ -376,22 +382,15 @@ function renderLevelTiles(levelIndex) {
       if (levelIndex + 1 < HIERARCHY.length) {
         renderLevelTiles(levelIndex + 1);
       } else {
-        openGroup3Detail(value);
+        // Останній рівень (группа3) обрано -> відкриваємо ЇЇ власну інфо-сторінку
+        // (саме групу3, що відповідає значенню обраної плитки, а не першу-ліпшу)
+        const scopeRows = rowsMatchingSelection(HIERARCHY.length);
+        const sampleRow = scopeRows[0];
+        renderGroup3Detail(value, sampleRow, scopeRows);
       }
     };
     grid.appendChild(div);
   });
-}
-
-// Останній рівень (группа2) обрано -> одразу відкриваємо інфо-сторінку группа3
-// (окремого екрану-списку плиток "группа3" немає — группа3 читається як дані
-// в межах обраної группа2).
-function openGroup3Detail(group2Value) {
-  const scopeRows = rowsMatchingSelection(HIERARCHY.length);
-  const sampleRow = scopeRows.find(r => cell(r, GROUP3_FIELD)) || scopeRows[0];
-  const group3Value = sampleRow ? (cell(sampleRow, GROUP3_FIELD) || group2Value) : group2Value;
-
-  renderGroup3Detail(group3Value, sampleRow, scopeRows);
 }
 
 function renderGroup3Detail(group3Value, sampleRow, scopeRows) {
