@@ -170,6 +170,58 @@ section.tile-container.grid-6col {
   section.tile-container.grid-6col { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* Об'єднаний екран группа2+группа3: плитка-мініатюра БЕЗ підпису —
+   назва группа3 з'являється лише при наведенні курсору (оверлей) */
+.tile.tile-thumb {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  min-height: unset;
+}
+
+.tile.tile-thumb img,
+.tile.tile-thumb svg {
+  width: 100%;
+  height: auto;
+  min-height: 130px;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 16px;
+  display: block;
+}
+
+.tile.tile-thumb .tile-hover-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 14px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.tile.tile-thumb .tile-hover-label small {
+  font-weight: 500;
+  color: #cbd5e1;
+  font-size: 11.5px;
+}
+
+.tile.tile-thumb:hover .tile-hover-label,
+.tile.tile-thumb:focus-visible .tile-hover-label {
+  opacity: 1;
+}
+
 /* Екран 4 (інфо-сторінка группа3): інформаційний блок займає 70% ширини */
 .group3-detail-box {
   background: #fff;
