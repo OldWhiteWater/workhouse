@@ -90,8 +90,8 @@ const OVERVIEW_FIELDS = [
 const HIERARCHY = [
   { key: 'parent', field: 'Родитель',  imageOwn: 'картинка_ родитель', label: 'Категорія' },
   { key: 'group1', field: 'группа1',   imageOwn: 'картинка_ группа1',  label: 'Підкатегорія' },
-  { key: 'group2', field: 'группа2',   imageOwn: null,                 label: 'Група' },
 ];
+const GROUP2_FIELD       = 'группа2';
 const GROUP3_FIELD       = 'группа3';
 const GROUP3_IMAGE_SMALL = 'картинка_ группа3_small';
 const GROUP3_IMAGE_BIG   = 'картинка_ группа3_big';
@@ -103,7 +103,7 @@ const HIDDEN_EXTRA_FIELDS_BASE = new Set([
   GROUP_KEY_FIELD_PRIMARY, GROUP_KEY_FIELD_FALLBACK,
   ...OVERVIEW_FIELDS,
   ...HIERARCHY.map(h => h.field), ...HIERARCHY.map(h => h.imageOwn).filter(Boolean),
-  GROUP3_FIELD, GROUP3_IMAGE_SMALL, GROUP3_IMAGE_BIG, GROUP3_DESCRIPTION
+  GROUP2_FIELD, GROUP3_FIELD, GROUP3_IMAGE_SMALL, GROUP3_IMAGE_BIG, GROUP3_DESCRIPTION
 ]);
 
 const HIDDEN_EXTRA_FIELDS = new Set(
@@ -296,9 +296,8 @@ function renderBreadcrumbs(target) {
     crumb.textContent = selection[h.key];
     crumb.style.cssText = 'cursor:pointer;color:#334155;font-weight:600;';
     if (i === HIERARCHY.length - 1) {
-      // Останній рівень (группа2) -> повернутися на об'єднаний екран
-      // группа2+группа3, а не на неіснуючий "рівень 4"
-      crumb.onclick = () => renderGroup3ThumbnailScreen(selection[h.key]);
+      // Останній рівень (группа1) -> повернутися на екран секцій группа2+группа3
+      crumb.onclick = () => renderGroup2SectionsScreen();
     } else {
       crumb.onclick = () => goToLevel(i + 1);
     }
@@ -343,7 +342,7 @@ function renderLevelTiles(levelIndex) {
   container.appendChild(wrap);
 
   const grid = document.createElement('section');
-  const gridClassByLevel = ['tile-container parent-grid', 'tile-container grid-6col', 'tile-container grid-6col'];
+  const gridClassByLevel = ['tile-container parent-grid', 'tile-container grid-6col'];
   grid.className = gridClassByLevel[levelIndex] || 'tile-container';
   container.appendChild(grid);
 
@@ -358,7 +357,7 @@ function renderLevelTiles(levelIndex) {
 
   [...valueMap.entries()].sort((a, b) => a[0].localeCompare(b[0], 'uk')).forEach(([value, info]) => {
     const div = document.createElement('div');
-    const tileClassByLevel = ['tile tile-parent', 'tile tile-medium', 'tile tile-medium'];
+    const tileClassByLevel = ['tile tile-parent', 'tile tile-medium'];
     div.className = tileClassByLevel[levelIndex] || 'tile';
 
     let imageSrc = '';
@@ -383,42 +382,24 @@ function renderLevelTiles(levelIndex) {
     div.onclick = () => {
       selection[levelDef.key] = value;
       navStack.push({ type: 'levelTiles', levelIndex });
-      if (levelIndex === 1) {
-        // група1 обрано -> перейти до группа2 (з авто-пропуском, якщо
-        // дочірня группа2 лише одна) -> об'єднаний екран группа2+группа3
-        enterGroup2Level();
-      } else if (levelIndex === 2) {
-        // группа2 обрано вручну (декілька дочірніх группа2) -> об'єднаний екран
-        renderGroup3ThumbnailScreen(value);
-      } else {
+      if (levelIndex + 1 < HIERARCHY.length) {
         renderLevelTiles(levelIndex + 1);
+      } else {
+        // Останній рівень (группа1) обрано -> одразу екран з секціями
+        // группа2 (жодного окремого кліку по группа2 більше немає)
+        renderGroup2SectionsScreen();
       }
     };
     grid.appendChild(div);
   });
 }
 
-// група1 обрано -> якщо в неї лише ОДНА дочірня группа2, пропускаємо екран
-// вибору группа2 і одразу показуємо об'єднаний екран (заголовок группа2 +
-// плитки группа3_small); якщо декілька — показуємо звичайний вибір группа2.
-function enterGroup2Level() {
-  const rows2 = rowsMatchingSelection(2);
-  const g2map = distinctValuesWithSample(rows2, 'группа2');
-  if (g2map.size <= 1) {
-    const only = [...g2map.keys()][0];
-    selection.group2 = only;
-    renderGroup3ThumbnailScreen(only);
-  } else {
-    renderLevelTiles(2);
-  }
-}
-
-// Об'єднаний екран "группа2 + группа3": заголовок = назва группа2, під ним
-// плитки-мініатюри картинка_ группа3_small БЕЗ підпису (назва группа3
-// показується лише при наведенні курсору, див. CSS .tile-hover-label).
-// Клік по мініатюрі одразу відкриває Екран 5 (фінальну вибірку), без
-// проміжної інфо-сторінки.
-function renderGroup3ThumbnailScreen(group2Value) {
+// Екран після вибору группа1: для КОЖНОЇ группа2 в цій группа1 виводиться
+// заголовок <h2>назва группа2</h2>, а під ним — сітка мініатюр группа3
+// (картинка_ группа3_small, БЕЗ підпису; назва + кількість товарів
+// показуються лише при наведенні курсору, див. CSS .tile-hover-label).
+// Якщо группа2 лише одна — це просто один заголовок + одна сітка.
+function renderGroup2SectionsScreen() {
   sidePanel.style.display = 'none';
   if (resultsContainer) { resultsContainer.style.display = 'none'; resultsContainer.innerHTML = ''; }
   if (catalogToolbar) catalogToolbar.style.display = 'flex';
@@ -430,40 +411,50 @@ function renderGroup3ThumbnailScreen(group2Value) {
   renderBreadcrumbs(wrap);
   container.appendChild(wrap);
 
-  const heading = document.createElement('h2');
-  heading.textContent = group2Value;
-  heading.style.cssText = 'margin:0 0 20px 0;font-size:20px;color:#0f172a;';
-  container.appendChild(heading);
+  const scopeRows = rowsMatchingSelection(HIERARCHY.length); // Родитель+группа1
+  const g2map = distinctValuesWithSample(scopeRows, GROUP2_FIELD);
 
-  const grid = document.createElement('section');
-  grid.className = 'tile-container grid-6col';
-  container.appendChild(grid);
-
-  const scopeRows = rowsMatchingSelection(3); // Родитель+группа1+группа2 (усі 3 вже в selection)
-  const g3map = distinctValuesWithSample(scopeRows, GROUP3_FIELD);
-
-  if (g3map.size === 0) {
-    showCatalogMessage(grid, `Немає значень у стовпці "${GROUP3_FIELD}" для цієї групи.`, 'error');
+  if (g2map.size === 0) {
+    showCatalogMessage(container, `Немає значень у стовпці "${GROUP2_FIELD}" для цієї підкатегорії.`, 'error');
     return;
   }
 
-  [...g3map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'uk')).forEach(([group3Value, info]) => {
-    const exactRows = scopeRows.filter(r => cell(r, GROUP3_FIELD) === group3Value);
-    const sampleRow = exactRows[0];
-    const imageSrc = cell(sampleRow, GROUP3_IMAGE_SMALL);
-    const fallback = getCategoryIconFallback(group3Value);
+  [...g2map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'uk')).forEach(([group2Value, g2info], sectionIndex) => {
+    const heading = document.createElement('h2');
+    heading.textContent = group2Value;
+    heading.style.cssText = `margin:${sectionIndex === 0 ? 0 : 32}px 0 16px 0;font-size:20px;color:#0f172a;`;
+    container.appendChild(heading);
 
-    const div = document.createElement('div');
-    div.className = 'tile tile-thumb';
-    div.innerHTML = `
-      ${tileImageHtml(imageSrc, group3Value, fallback)}
-      <span class="tile-hover-label">${group3Value}<br><small>${info.count} товарів</small></span>
-    `;
-    div.onclick = () => {
-      navStack.push({ type: 'group3thumbs', group2Value });
-      renderGroup3Detail(group3Value, sampleRow, exactRows);
-    };
-    grid.appendChild(div);
+    const grid = document.createElement('section');
+    grid.className = 'tile-container grid-6col';
+    container.appendChild(grid);
+
+    const group2Rows = scopeRows.filter(r => cell(r, GROUP2_FIELD) === group2Value);
+    const g3map = distinctValuesWithSample(group2Rows, GROUP3_FIELD);
+
+    if (g3map.size === 0) {
+      showCatalogMessage(grid, `Немає значень у стовпці "${GROUP3_FIELD}" для цієї групи.`, 'error');
+      return;
+    }
+
+    [...g3map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'uk')).forEach(([group3Value, info]) => {
+      const exactRows = group2Rows.filter(r => cell(r, GROUP3_FIELD) === group3Value);
+      const sampleRow = exactRows[0];
+      const imageSrc = cell(sampleRow, GROUP3_IMAGE_SMALL);
+      const fallback = getCategoryIconFallback(group3Value);
+
+      const div = document.createElement('div');
+      div.className = 'tile tile-thumb';
+      div.innerHTML = `
+        ${tileImageHtml(imageSrc, group3Value, fallback)}
+        <span class="tile-hover-label">${group3Value}<br><small>${info.count} товарів</small></span>
+      `;
+      div.onclick = () => {
+        navStack.push({ type: 'group2sections' });
+        renderGroup3Detail(group3Value, sampleRow, exactRows);
+      };
+      grid.appendChild(div);
+    });
   });
 }
 
@@ -852,7 +843,10 @@ function createFilterSection(categoryDetail, onFilterChange) {
 
   FILTER_FIELDS.forEach(headerName => {
     const values = categoryDetail.filterValues[headerName];
-    if (!values || values.length === 0) return;
+    // Якщо в межах вибраної группа3 (чи "показати всі товари") це поле має
+    // лише ОДНЕ значення — ховаємо фільтр: користувач уже фактично обрав
+    // його, проходячи по екранах навігації, показувати нічого вибирати.
+    if (!values || values.length <= 1) return;
 
     const details = document.createElement('details');
     details.className = 'details-filter-panel';
@@ -1102,8 +1096,8 @@ backButton.onclick = () => {
   }
 
   const prevScreen = navStack.pop();
-  if (prevScreen.type === 'group3thumbs') {
-    renderGroup3ThumbnailScreen(prevScreen.group2Value);
+  if (prevScreen.type === 'group2sections') {
+    renderGroup2SectionsScreen();
   } else if (prevScreen.type === 'group3detail') {
     renderGroup3Detail(prevScreen.group3Value, prevScreen.sampleRow, prevScreen.scopeRows);
   } else {
