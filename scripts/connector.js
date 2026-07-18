@@ -28,8 +28,6 @@
 
 const staticTiles = [];
 
-const XLSX_PATH = './source/connector.xlsx';
-
 // ---- Канонічні поля (за назвою колонки, стійко до пробілів навколо "_") ----
 const CATEGORY_FIELD   = 'Вид изделия';           // фолбек-режим (старі дані)
 const CARD_ID_FIELD    = 'Номер карточки';
@@ -225,13 +223,34 @@ function getCategoryIconFallback(categoryName) {
   return getFallbackIcon();
 }
 
-async function loadWorkbookRows() {
+// Довідник ієрархії (Родитель/группа1/группа2/группа3/картинки/опис),
+// зв'язується з товарними файлами через "Номер группы ch3".
+const TREE_XLSX_PATH = './source/connector_tree.xlsx';
+
+// Товарні файли: кожен новий напрямок асортименту — окремий файл у цьому
+// списку. Файл може НЕ містити колонок ієрархії взагалі (тільки "Номер
+// группы ch3" + власні товарні поля) — вони підтягнуться з дерева. Якщо
+// колонки ієрархії все ж присутні (старі файли) — вони будуть перезаписані
+// значеннями з дерева, щоб не було розбіжностей.
+const PRODUCT_XLSX_PATHS = [
+  './source/connector.xlsx',
+  './source/connector_service.xlsx'
+];
+
+const HIERARCHY_TREE_FIELDS = [
+  'Родитель', 'картинка_ родитель',
+  'группа1', 'картинка_ группа1',
+  'группа2',
+  'группа3', 'описание_ группа3', 'картинка_ группа3_small', 'картинка_ группа3_big'
+];
+
+async function fetchAndParseXlsx(path) {
   if (!window.XLSX) throw new Error('SheetJS XLSX library is not loaded.');
 
-  const fileUrl = new URL(XLSX_PATH, window.location.href);
+  const fileUrl = new URL(path, window.location.href);
   fileUrl.searchParams.set('v', Date.now());
   const response = await fetch(fileUrl.toString(), { cache: 'no-store' });
-  if (!response.ok) throw new Error(`Cannot load ${XLSX_PATH}: ${response.status} ${response.statusText}`);
+  if (!response.ok) throw new Error(`Cannot load ${path}: ${response.status} ${response.statusText}`);
 
   const arrayBuffer = await response.arrayBuffer();
   const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -239,8 +258,117 @@ async function loadWorkbookRows() {
   const sheetName = knownSheetNames.find(n => workbook.SheetNames.includes(n)) || workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
   const sheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
-  console.debug('Read sheet:', sheetName, 'rows:', sheetRows.length);
+  console.debug('Read', path, '-> sheet:', sheetName, 'rows:', sheetRows.length);
   return sheetRows;
+}
+
+// Довідник дерева: Map(ch3 -> {Родитель, картинка_ родитель, группа1, ...})
+async function loadTreeMap() {
+  const sheetRows = await fetchAndParseXlsx(TREE_XLSX_PATH);
+  const headerRow = sheetRows[0] || [];
+  const idx = {};
+  headerRow.forEach((h, i) => {
+    const k = normalizeHeaderKey(h);
+    if (!(k in idx)) idx[k] = i;
+  });
+  const tcell = (row, name) => {
+    const i = idx[normalizeHeaderKey(name)];
+    return i === undefined ? '' : normalizeCell(row[i]);
+  };
+
+  const map = new Map();
+  sheetRows.slice(1).forEach(row => {
+    const ch3 = tcell(row, GROUP_KEY_FIELD_PRIMARY);
+    if (!ch3) return;
+    const entry = {};
+    HIERARCHY_TREE_FIELDS.forEach(f => { entry[f] = tcell(row, f); });
+    map.set(ch3, entry);
+  });
+  console.debug('Дерево ієрархії завантажено, груп ch3:', map.size);
+  return map;
+}
+
+// Завантажує усі товарні файли з PRODUCT_XLSX_PATHS та об'єднує їх у ОДИН
+// набір рядків з ОБ'ЄДНАНИМ (union) заголовком — так само, як раніше
+// робилося вручну через pandas.concat. Файл, що не вдалося завантажити
+// (ще не існує на сервері тощо), просто пропускається з попередженням.
+async function loadMergedProductRows() {
+  const combinedHeader = [];
+  const combinedIndex = {};
+  const ensureColumn = (fieldName) => {
+    const key = normalizeHeaderKey(fieldName);
+    if (key in combinedIndex) return combinedIndex[key];
+    const i = combinedHeader.length;
+    combinedHeader.push(fieldName);
+    combinedIndex[key] = i;
+    return i;
+  };
+
+  const combinedRows = [];
+  let filesLoaded = 0;
+
+  for (const path of PRODUCT_XLSX_PATHS) {
+    let sheetRows;
+    try {
+      sheetRows = await fetchAndParseXlsx(path);
+    } catch (err) {
+      console.warn(`Товарний файл пропущено (не вдалося завантажити): ${path}`, err);
+      continue;
+    }
+    filesLoaded++;
+    const fileHeader = sheetRows[0] || [];
+    const fileIdxToCombinedIdx = fileHeader.map(h => ensureColumn(h));
+    sheetRows.slice(1).forEach(row => {
+      const newRow = new Array(combinedHeader.length).fill('');
+      row.forEach((val, i) => {
+        const ci = fileIdxToCombinedIdx[i];
+        if (ci !== undefined) newRow[ci] = val;
+      });
+      combinedRows.push(newRow);
+    });
+  }
+
+  if (filesLoaded === 0) {
+    throw new Error('Жоден товарний файл з PRODUCT_XLSX_PATHS не вдалося завантажити.');
+  }
+  console.debug('Товарних файлів завантажено:', filesLoaded, '| разом рядків:', combinedRows.length, '| колонок:', combinedHeader.length);
+  return { header: combinedHeader, rows: combinedRows };
+}
+
+// Дописує (створює за потреби) колонки ієрархії в header/rows і заповнює їх
+// значеннями з дерева за "Номер группы ch3" — незалежно від того, чи були
+// ці колонки в товарному файлі взагалі, і перезаписуючи їх, якщо були
+// (дерево — єдине джерело правди, щоб уникнути розбіжностей між файлами).
+function hydrateRowsWithTree(header, rows, treeMap) {
+  const idx = {};
+  header.forEach((h, i) => {
+    const k = normalizeHeaderKey(h);
+    if (!(k in idx)) idx[k] = i;
+  });
+  const ensureColumn = (fieldName) => {
+    const key = normalizeHeaderKey(fieldName);
+    if (key in idx) return idx[key];
+    const i = header.length;
+    header.push(fieldName);
+    idx[key] = i;
+    return i;
+  };
+
+  const fieldIdx = {};
+  HIERARCHY_TREE_FIELDS.forEach(f => { fieldIdx[f] = ensureColumn(f); });
+  const ch3Idx = ensureColumn(GROUP_KEY_FIELD_PRIMARY);
+
+  let hydrated = 0, noCh3 = 0, notInTree = 0;
+  rows.forEach(row => {
+    while (row.length < header.length) row.push('');
+    const ch3 = normalizeCell(row[ch3Idx]);
+    if (!ch3) { noCh3++; return; }
+    const entry = treeMap.get(ch3);
+    if (!entry) { notInTree++; return; }
+    HIERARCHY_TREE_FIELDS.forEach(f => { row[fieldIdx[f]] = entry[f]; });
+    hydrated++;
+  });
+  console.debug(`Гідратація дерева: оновлено ${hydrated} рядків; без ch3: ${noCh3}; ch3 відсутній у дереві: ${notInTree}`);
 }
 
 function indexHeaders(headerRow) {
@@ -1049,10 +1177,12 @@ function showFlatTileDetails(tile) {
 
 async function initializeCatalog() {
   try {
-    const sheetRows = await loadWorkbookRows();
-    const headerRow = sheetRows[0] || [];
-    indexHeaders(headerRow);
-    allRows = sheetRows.slice(1);
+    const treeMap = await loadTreeMap();
+    const { header, rows } = await loadMergedProductRows();
+    hydrateRowsWithTree(header, rows, treeMap);
+
+    indexHeaders(header);
+    allRows = rows;
 
     deepHierarchyAvailable = hasField(HIERARCHY[0].field);
 
@@ -1076,7 +1206,7 @@ async function initializeCatalog() {
     container.style.display = 'grid';
     showCatalogMessage(
       container,
-      `Не вдалося завантажити ${XLSX_PATH}. Відкрийте сторінку через локальний сервер і перевірте, що файл існує в папці source.`,
+      `Не вдалося завантажити довідник дерева (${TREE_XLSX_PATH}) або товарні файли (${PRODUCT_XLSX_PATHS.join(', ')}). Відкрийте сторінку через локальний сервер і перевірте, що файли існують у папці source.`,
       'error'
     );
   }
