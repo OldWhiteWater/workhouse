@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Світлотехніка</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/svitlotekhnika.css">
+</head>
+<body>
+  <header>
+    <img src="images/header-image.jpg" alt="Світлотехніка">
+  </header>
+
+  <main>
+    <aside id="sidePanel">
+      <h3 id="sideTitle">Світлотехніка</h3>
+      <div id="sideList"></div>
+    </aside>
+
+    <div class="catalog-content">
+      <div id="catalogToolbar" class="catalog-toolbar">
+        <button id="backButton" class="back-button" type="button">Назад</button>
+      </div>
+
+      <!-- Плитки груп -->
+      <section id="tileSection" class="tile-container"></section>
+        <!-- ДОДАЙ ЦЕ -->
+      <!-- div id="displayValues" class="results-panel"></div -->
+
+      <!-- Фінальна видача (товари) -->
+      <div id="resultsContainer" class="results-panel"></div>
+
+    </div>
+  </main>
+
+  <footer>
+    <img src="images/footer-image.jpg" alt="Світлотехніка">
+  </footer>
+
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <button id="modalClose" class="modal-close" type="button">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Бібліотека для роботи з XLSX -->
+  <script src="scripts/xlsx.full.min.js"></script>
+
+  <!-- Основний каталог -->
+  <script src="scripts/svitlotekhnika.js"></script>
+</body>
+</html>
