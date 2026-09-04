@@ -39,7 +39,8 @@ const PROPERTIES_FIELD = 'Свойства';
 const GROUP_KEY_FIELD_PRIMARY  = 'Номер группы ch3';
 const GROUP_KEY_FIELD_FALLBACK = 'Номер группы ch2';
 
-const FILTER_FIELDS = ['Диаметр трубки, мм', 'Диаметр резьбы', 'Диаметр штуцера, мм', 'Диаметр соединения БРС, мм', 'Материал корпуса', 'Геометрия', 'Типы портов', 'Конструктивные признаки'];
+const FILTER_FIELDS = ['Диаметр трубки, мм', 'Диаметр резьбы', 'Диаметр штуцера, мм', 'Диаметр соединения БРС, мм', 'Материал корпуса', 'Геометрия', 'Типы портов', 'Конструктивные признаки', 'Размер: ID', 'Размер: OD', 'толщины стенки S', 'Длина', 'Рабочее давление', 'Разрывное давление', 'Материал основы', 'Рабочая среда', 'Количество слоёв / слоёв армирования', 'Стандарт / серия', 'Конструкция стенки' ];
+
 
 // Деякі фільтри збираються не з однієї колонки, а з декількох "Порт N ..."
 // одразу (наприклад діаметр трубки є в кожного порту окремо). Для таких
@@ -97,18 +98,37 @@ const GROUP3_IMAGE_SMALL = 'картинка_ группа3_small';
 const GROUP3_IMAGE_BIG   = 'картинка_ группа3_big';
 const GROUP3_DESCRIPTION = 'описание_ группа3';
 
+const PIPELINE_PROPERTIES = [
+  'Размер: ID',
+  'Размер: OD',
+  'толщины стенки S',
+  'Длина',
+  'Рабочее давление',
+  'Разрывное давление',
+  'Материал основы',
+  'Рабочая среда',
+  'Количество слоёв / слоёв армирования',
+  'Стандарт / серия',
+  'Конструкция стенки'
+];
+
 const HIDDEN_EXTRA_FIELDS_BASE = new Set([
   CARD_ID_FIELD, CARD_CODE_FIELD, CARD_NAME_FIELD, FULL_NAME_FIELD,
   ERRORS_FIELD, PROPERTIES_FIELD, CATEGORY_FIELD,
   GROUP_KEY_FIELD_PRIMARY, GROUP_KEY_FIELD_FALLBACK,
   ...OVERVIEW_FIELDS,
-  ...HIERARCHY.map(h => h.field), ...HIERARCHY.map(h => h.imageOwn).filter(Boolean),
-  GROUP2_FIELD, GROUP3_FIELD, GROUP3_IMAGE_SMALL, GROUP3_IMAGE_BIG, GROUP3_DESCRIPTION
+  ...HIERARCHY.map(h => h.field),
+  ...HIERARCHY.map(h => h.imageOwn).filter(Boolean),
+  GROUP2_FIELD, GROUP3_FIELD, GROUP3_IMAGE_SMALL, GROUP3_IMAGE_BIG, GROUP3_DESCRIPTION,
+
+  // --- додаємо pipeline‑поля ---
+  ...PIPELINE_PROPERTIES
 ]);
 
 const HIDDEN_EXTRA_FIELDS = new Set(
   [...HIDDEN_EXTRA_FIELDS_BASE].map(normalizeHeaderKey)
 );
+
 
 let allHeaders = [];
 let headerIndex = {};
@@ -234,7 +254,8 @@ const TREE_XLSX_PATH = './source/connector_tree.xlsx';
 // значеннями з дерева, щоб не було розбіжностей.
 const PRODUCT_XLSX_PATHS = [
   './source/connector.xlsx',
-  './source/connector_service.xlsx'
+  './source/connector_service.xlsx',
+  './source/pipeline.xlsx'
 ];
 
 const HIERARCHY_TREE_FIELDS = [
@@ -759,6 +780,7 @@ function modalRow(label, value, opts = {}) {
 }
 
 function buildPortSections(row) {
+ 
   const portNumbers = new Set();
   allHeaders.forEach(h => {
     const m = h.match(/^Порт (\d+) /);
@@ -830,6 +852,20 @@ function openModal(row) {
       ${overviewRows.join('')}
     </div><hr class="modal-divider">`;
   }
+
+  // --- Свойства трубопровода (pipeline.xlsx) ---
+  const pipelineRows = PIPELINE_PROPERTIES
+  .map(f => [f, cell(row, f)])
+  .filter(([, val]) => val !== '')
+  .map(([label, val]) => modalRow(label, val));
+
+  if (pipelineRows.length > 0) {
+  html += `<div class="modal-section">
+    <p class="modal-section-title">Свойства трубопровода</p>
+    ${pipelineRows.join('')}
+  </div><hr class="modal-divider">`;
+  }
+
 
   html += buildPortSections(row);
   html += buildExtraSection(row);
