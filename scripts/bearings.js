@@ -772,3 +772,38 @@ function ensureXLSXAndInit() {
 }
 
 ensureXLSXAndInit();
+
+/* ===== МЕНЮ КАТАЛОГА В ШАПКЕ ===== */
+(function initHeaderCatalogMenu() {
+  const btn  = document.querySelector('.catalog-btn');
+  const menu = document.querySelector('.catalog-menu');
+
+  if (!btn || !menu) return;
+
+  // Открытие / закрытие по клику на кнопку
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();          // чтобы клик не дошёл до document
+    const isOpen = menu.classList.toggle('show');
+    btn.classList.toggle('active', isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  // Закрытие при клике вне меню и вне кнопки
+  document.addEventListener('click', (e) => {
+    if (!menu.classList.contains('show')) return;
+    if (e.target.closest('.catalog-menu') || e.target.closest('.catalog-btn')) return;
+
+    menu.classList.remove('show');
+    btn.classList.remove('active');
+    btn.setAttribute('aria-expanded', 'false');
+  });
+
+  // Закрытие по Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.classList.contains('show')) {
+      menu.classList.remove('show');
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();

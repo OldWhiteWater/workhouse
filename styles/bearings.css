@@ -768,3 +768,97 @@ details label:hover {
     height: 100px;
   }
 }
+
+
+/* ===== HEADER: контейнер с кнопкой поверх картинки ===== */
+
+.main-header {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1907 / 186;   /* ← пропорции images/header-image.jpg */
+  overflow: visible;           /* чтобы выпадающее меню не обрезалось */
+}
+
+.main-header__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center top;
+}
+
+/* Адаптивная обертка для кнопки — координаты в % от картинки */
+.catalog-wrapper {
+  position: absolute;
+  top: 10%;
+  left: 29.3%;
+  width: 8%;
+  height: 27.8%;
+  z-index: 2;
+}
+
+/* Прозрачная кнопка-триггер */
+.catalog-btn {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+
+.catalog-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.catalog-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Выпадающее меню каталога */
+.catalog-menu {
+  display: none;
+  position: absolute;
+  top: 115%;
+  left: 0;
+  width: 240px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 8px 0;
+  margin: 0;
+  list-style: none;
+  z-index: 9999;
+}
+
+.catalog-menu.show {
+  display: block;
+}
+
+.catalog-menu li a {
+  color: #333333;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+}
+
+.catalog-menu li a:hover {
+  background-color: #f5f5f5;
+  color: #0056b3;
+}
+
+@media (max-width: 480px) {
+  .catalog-menu {
+    width: 180px;
+  }
+  .catalog-menu li a {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
