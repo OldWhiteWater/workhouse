@@ -11,7 +11,10 @@
 
 <header>
   <div class="main-header">
-    <img src="images/header-image.jpg" alt="З'єднувачі" class="main-header__img">
+    <picture>
+      <source media="(max-width: 600px)" srcset="images/header-image-mobile.jpg">
+      <img src="images/header-image.jpg" alt="З'єднувачі" class="main-header__img">
+    </picture>
 
     <div class="catalog-wrapper">
       <button type="button" class="catalog-btn" aria-label="Каталог" aria-expanded="false"></button>

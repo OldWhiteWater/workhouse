@@ -1008,12 +1008,18 @@ details label:hover {
   color: #0056b3;
 }
 
-@media (max-width: 480px) {
-  .catalog-menu {
-    width: 180px;
+@media (max-width: 600px) {
+  .main-header {
+    aspect-ratio: 749 / 167;   /* реальный размер header-image-mobile.jpg */
   }
-  .catalog-menu li a {
-    padding: 8px 12px;
-    font-size: 12px;
+
+  /* Координаты хотспота под мобильную картинку — ВРЕМЕННЫЕ значения,
+     подставьте точные после того, как картинка будет готова: замерьте
+     % от левого/верхнего края и % от ширины/высоты именно на ней */
+  .catalog-wrapper {
+    top: 11%;
+    left: 20.5%;
+    width: 20.7%;
+    height: 30%;
   }
 }

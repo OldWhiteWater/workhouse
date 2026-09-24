@@ -4,24 +4,38 @@ const CATEGORY_FIELD   = 'Вид изделия';
 const CARD_ID_FIELD    = 'Картка';
 const CARD_CODE_FIELD  = 'Код за каталогом';
 const CARD_NAME_FIELD  = 'Найменування товару';
-const FULL_NAME_FIELD  = 'Товар';
+// "Товар" — це загальна категорія («Лампа автомобільна», однакова для
+// десятків рядків), а НЕ повніша версія назви (як було в connector.js).
+// Показувати її як підзаголовок під конкретною назвою товару — вводить
+// в оману (буде дублюватись під кожною карткою). FULL_NAME_FIELD тут не
+// існує як окреме поле — прибираємо цю роль замість хибного маппінгу.
+const FULL_NAME_FIELD  = '';
 const ERRORS_FIELD     = 'Ошибки';
 const PROPERTIES_FIELD = 'Свойства';
 
 const GROUP_KEY_FIELD_PRIMARY  = 'Номер группы ch3';
 const GROUP_KEY_FIELD_FALLBACK = 'Номер группы ch2';
 
+// "Маркування B/C/D/H/M/P/R/S/T/W" та "Цоколь B/P/PG/PK/PX/S/W/X/FesToon" —
+// це pivot-колонки: перевірено на реальних даних, у кожного товару
+// заповнена РІВНО ОДНА з колонок кожної групи (решта порожні). Тому це два
+// віртуальні фільтри (як "Діаметр трубки, мм" з Порт N у connector.js),
+// а не 20 окремих. "Застосування авто 2" — друга колонка застосування,
+// раніше була відсутня в списку.
 const FILTER_FIELDS = [
-  'Маркування B','Маркування C','Маркування D','Маркування H','Маркування M',
-  'Маркування P','Маркування R','Маркування S','Маркування T','Маркування W',
-  'Маркування','Джерело світла','Кількість світлодіодів','Тип світлодіодів',
-  'Цоколь B','Цоколь P','Цоколь PG','Цоколь PK','Цоколь PX','Цоколь S',
-  'Цоколь W','Цоколь X','Цоколь FesToon','Довжина','Напруга, В','Потужність, Вт',
+  'Маркування', 'Цоколь',
+  'Джерело світла','Кількість світлодіодів','Тип світлодіодів',
+  'Довжина','Напруга, В','Потужність, Вт',
   'Колірна температура, К','Застосування авто','Колір світіння','Кількість контактів',
   'Виконання','Особливості'
 ];
 
-const VIRTUAL_FILTER_COLUMN_PATTERNS = {};
+const VIRTUAL_FILTER_COLUMN_PATTERNS = {
+  'Маркування': /^Маркування( [A-ZА-Я]+)?$/i,
+  'Цоколь': /^Цоколь [A-Za-z]+$/i,
+  'Застосування авто': /^Застосування авто( \d+)?$/i
+};
+
 
 const OVERVIEW_FIELDS = [
   'Джерело світла','Тип світлодіодів','Напруга, В',
@@ -172,8 +186,19 @@ function sortValues(values) {
 
 
 function getFieldValuesForRow(fieldName, row) {
-  const value = cell(row, fieldName);
+  const pattern = VIRTUAL_FILTER_COLUMN_PATTERNS[fieldName];
+  if (pattern) {
+    const values = new Set();
+    allHeaders.forEach(h => {
+      if (pattern.test(h)) {
+        const v = cell(row, h);
+        if (v) values.add(v);
+      }
+    });
+    return [...values];
+  }
 
+  const value = cell(row, fieldName);
   if (!value) return [];
 
   if (typeof value === 'string' && value.includes(',')) {
@@ -1322,8 +1347,6 @@ function ensureXLSXAndInit() {
 }
 
 ensureXLSXAndInit();
-
-
 
 /* ===== МЕНЮ КАТАЛОГА В ШАПКЕ ===== */
 (function initHeaderCatalogMenu() {
