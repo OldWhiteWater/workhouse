@@ -17,12 +17,19 @@
     </picture>
 
     <div class="catalog-wrapper">
-      <button type="button" class="catalog-btn" aria-label="Каталог" aria-expanded="false"></button>
-      <ul class="catalog-menu">
-        <li><a href="connector.html">З'єднувачі</a></li>
-        <li><a href="bearings.html">Підшипники</a></li>
-        <li><a href="svitlotekhnika.html">Світлотехніка</a></li>
-      </ul>
+     <button type="button" class="catalog-btn" id="catalogBtn" aria-label="Каталог" aria-expanded="false"></button>
+      <!-- Контейнер для мега-меню -->
+      <div class="mega-menu" id="megaMenu">
+        <div class="mega-menu__header">
+         <span>КАТАЛОГ ТОВАРІВ</span>
+         <span class="mega-menu__arrow" id="menuCloseBtn" style="cursor:pointer;">✕</span>
+        </div>
+        <div class="mega-menu__body">
+         <ul class="mega-menu__col mega-menu__col--level1" id="menuLevel1"></ul>
+         <ul class="mega-menu__col mega-menu__col--level2" id="menuLevel2"></ul>
+        <div class="mega-menu__col mega-menu__col--level3" id="menuLevel3"></div>
+       </div>
+      </div>
     </div>
   </div>
 </header>
@@ -55,5 +62,7 @@
 
   <script src="scripts/xlsx.full.min.js"></script>
   <script src="scripts/connector.js"></script>
+    <!-- Добавили подключение -->
+    <script src="scripts/main.js"></script>
 </body>
 </html>

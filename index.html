@@ -1,33 +1,63 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Інтерактивне дерево товарів</title>
-  <link rel="stylesheet" href="styles/style.css">
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Головна</title>
+  <!-- Подключение внешнего CSS (ваши базовые стили) -->
+  <link rel="stylesheet" href="styles/connector.css">
 </head>
 <body>
 
-  <header class="site-header">
-    <nav class="nav-container">
-      <a href="index.html" class="nav-link" aria-current="page">Головна</a>
-      <a href="catalog.html" class="nav-link">Каталог</a>
-      <a href="diagram.html" class="nav-link">Діаграма</a>
-      <a href="bearings.html" class="nav-link">Підшипники</a>
-    </nav>
-  </header>
+<header>
+  <div class="main-header">
+    <picture>
+      <source media="(max-width: 600px)" srcset="images/header-image-mobile.jpg">
+      <img src="images/header-image.jpg" alt="OMEGA" class="main-header__img">
+    </picture>
 
-  <main class="main-content">
-    <h1 class="page-title">Каталог товарів</h1>
-    <div id="importedTree">Завантаження каталогу...</div>
-  </main>
+    <div class="catalog-wrapper">
+      <!-- Прозрачная кнопка поверх картинки -->
+      <button type="button" class="catalog-btn" id="catalogBtn" aria-label="Каталог" aria-expanded="false"></button>
+      <!-- Контейнер для мега-меню -->
+      <div class="mega-menu" id="megaMenu">
+        <div class="mega-menu__header">
+          <span>КАТАЛОГ ТОВАРІВ</span>
+          <span class="mega-menu__arrow" id="menuCloseBtn" style="cursor:pointer;">✕</span>
+        </div>
+        <div class="mega-menu__body">
+          <ul class="mega-menu__col mega-menu__col--level1" id="menuLevel1"></ul>
+          <ul class="mega-menu__col mega-menu__col--level2" id="menuLevel2"></ul>
+          <div class="mega-menu__col mega-menu__col--level3" id="menuLevel3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
 
-  <script src="scripts/main.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      importTreeFromExcel();
-    });
-  </script>
+<main id="mainContent" class="catalog-main-view">
+  <!-- Сюда будет рендериться контент при выборе категории -->
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Закрити">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>
+  <img src="images/footer-image.jpg" alt="Футер сайту" onerror="this.style.display='none'" />
+</footer>
+
+<!-- Подключаем библиотеку для чтения Excel (нужна для меню) -->
+<script src="scripts/xlsx.full.min.js"></script>
+
+<!-- Подключаем main.js (логика выпадающего меню) -->
+<script src="scripts/main.js"></script>
+
+<!-- connector.js ОТКЛЮЧЕН (закомментирован) -->
+<!-- <script src="scripts/connector.js"></script> -->
+
 </body>
 </html>

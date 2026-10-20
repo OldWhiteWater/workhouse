@@ -1023,3 +1023,444 @@ details label:hover {
     height: 30%;
   }
 }
+
+
+/* ===== MEGA MENU (ВЫПАДАЮЩИЙ КАТАЛОГ) — СТИЛЬ OMEGA ===== */
+
+.mega-menu {
+  display: none !important;
+  position: absolute;
+  top: 100%; /* Прилегает прямо к кнопке */
+  left: 0;
+  width: 900px;
+  height: 450px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  border-radius: 0 0 8px 8px; /* Скругляем только нижние углы */
+  z-index: 9999;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.mega-menu.show {
+  display: flex !important;
+}
+
+/* Заголовок меню (в тон синей шапки) */
+.mega-menu__header {
+  background-color: #1f467e; /* Глубокий синий (как кнопка "Каталоги") */
+  color: #ffffff;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.mega-menu__arrow {
+  cursor: pointer;
+  font-size: 16px;
+  color: #a0b6d6; 
+  transition: color 0.2s;
+}
+
+.mega-menu__arrow:hover {
+  color: #ffffff;
+}
+
+/* Тело меню - три колонки */
+.mega-menu__body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mega-menu__col {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Колонка 1 (Рівень 1) - Светло-синяя (как полоса "Меню" на вашем скрине) */
+.mega-menu__col--level1 {
+  width: 240px;
+  background-color: #4a7ab5; /* Светло-синий */
+  color: #ffffff;
+}
+
+/* Колонка 2 (Рівень 2) - Светло-серая */
+.mega-menu__col--level2 {
+  width: 240px;
+  background-color: #f0f4f8; /* Очень светлый серо-голубой */
+  border-right: 1px solid #d0dce8;
+}
+
+/* Колонка 3 (Рівень 3) - Белая */
+.mega-menu__col--level3 {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 16px;
+}
+
+/* Стили пунктов меню */
+.menu-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 13.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Стрелочки */
+.level1-item::after,
+.level2-item::after {
+  content: '›';
+  font-size: 20px;
+  color: #a0b6d6;
+  transition: color 0.2s, transform 0.2s;
+}
+
+/* Ховер и активный класс для 1 уровня */
+.level1-item:hover {
+  background-color: #386ba5; /* Чуть темнее при наведении */
+}
+.level1-item.active {
+  background-color: #ffffff;
+  color: #1f467e; /* Синий текст на белом фоне */
+  font-weight: 600;
+}
+.level1-item.active::after {
+  color: #1f467e;
+  transform: translateX(3px); /* Стрелочка чуть сдвигается */
+}
+
+/* Ховер и активный класс для 2 уровня */
+.level2-item {
+  color: #334155;
+}
+.level2-item:hover {
+  background-color: #e2e8f0;
+}
+.level2-item.active {
+  background-color: #ffffff;
+  color: #1f467e;
+  font-weight: 600;
+  border-left: 3px solid #1f467e; /* Синяя полоска слева */
+}
+.level2-item.active::after {
+  color: #1f467e;
+  transform: translateX(3px);
+}
+
+/* Сетка 3 уровня */
+.level3-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.level3-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.level3-item:hover {
+  background-color: #f0f4f8;
+  border-color: #d0dce8;
+}
+
+/* Иконка товара */
+.level3-icon {
+  width: 44px;
+  height: 44px;
+  background: #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.level3-text {
+  font-size: 13px;
+  color: #1e293b;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.no-items {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Стили скроллбара для колонок */
+.mega-menu__col::-webkit-scrollbar {
+  width: 6px;
+}
+.mega-menu__col::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mega-menu__col::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+
+/* ===== МОБИЛЬНАЯ ВЕРСИЯ МЕГА-МЕНЮ (до 600px) ===== */
+@media (max-width: 600px) {
+  .mega-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 10000;
+    background: #f0f4f8;
+  }
+
+  .mega-menu__arrow {
+    font-size: 24px;
+    padding: 10px; /* Увеличили область клика */
+    cursor: pointer;
+  }
+
+  .mega-menu__body {
+    flex-direction: column;
+    position: relative;
+    height: calc(100vh - 50px); /* Высота за вычетом шапки меню */
+  }
+
+  .mega-menu__col--level2,
+  .mega-menu__col--level3 {
+    display: none; 
+    width: 100%;
+    height: 100%;
+    border-right: none;
+    overflow-y: auto;
+  }
+
+  .mega-menu__col--level1 {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    color: #1f467e;
+    overflow-y: auto;
+  }
+
+  .level1-item {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px; /* Удобно тапать */
+  }
+  .level1-item::after {
+    color: #1f467e;
+  }
+  .level1-item.active {
+    background-color: #f0f4f8;
+    color: #1f467e;
+  }
+
+  .mega-menu__col.mobile-active {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: #ffffff; 
+  }
+
+  /* Кнопка Назад */
+  .mobile-header-nav {
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f4f8;
+    border-bottom: 1px solid #cbd5e1;
+  }
+
+  .mobile-back-btn {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    color: #1f467e;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    width: 100%;
+  }
+
+  .mobile-back-btn:active {
+    background-color: #e2e8f0;
+  }
+  
+  .mobile-nav-title {
+    color: #64748b;
+    font-size: 13px;
+    padding: 0 16px 12px 16px;
+  }
+
+  /* Сетка 3-го уровня на мобилке */
+  .level3-grid {
+    grid-template-columns: 1fr !important;
+    padding: 16px;
+    display: grid;
+    gap: 0;
+  }
+  
+  .level3-item {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  /* Отключаем ховеры на мобилке */
+  .level1-item:hover, .level2-item:hover, .level3-item:hover {
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+  .level2-item.active {
+    background-color: #f8fafc !important;
+  }
+}
+
+/* ===== СТИЛИ ДЛЯ MAIN (КАТЕГОРИИ) ===== */
+
+.catalog-main-view {
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+/* Заголовок H1 */
+.category-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 32px 0;
+}
+
+/* Сетка колонок */
+.category-columns {
+  display: flex;
+  gap: 32px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  align-items: flex-start;
+}
+
+/* Отдельная колонка */
+.category-column {
+  min-width: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Шапка колонки */
+.column-header {
+  margin-bottom: 16px;
+}
+
+.column-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+/* Список 3-го уровня */
+.column-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.column-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+}
+
+.column-list a {
+  color: #475569;
+  text-decoration: none;
+  line-height: 1.4;
+  transition: color 0.2s;
+}
+
+.column-list a:hover {
+  color: #1f467e;
+  text-decoration: underline;
+}
+
+.column-list .count {
+  color: #94a3b8;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+/* Скрытые элементы */
+.column-list li.hidden-item {
+  display: none !important;
+}
+
+/* Ссылка "Показать все" */
+.show-all-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13.5px;
+  color: #2563eb;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  margin-top: auto;
+}
+
+.show-all-link:hover {
+  text-decoration: underline;
+}
+
+/* Адаптивность для мобилок */
+@media (max-width: 768px) {
+  .catalog-main-view {
+    padding: 20px 16px;
+  }
+  .category-columns {
+    flex-direction: column;
+    gap: 30px;
+    overflow-x: visible;
+  }
+  .column-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+  }
+}
