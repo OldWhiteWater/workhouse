@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Головна</title>
+  <!-- Подключение внешнего CSS (ваши базовые стили) -->
+  <link rel="stylesheet" href="styles/menu.css">
+</head>
+<body>
+
+<header>
+  <div class="main-header">
+    <picture>
+      <source media="(max-width: 600px)" srcset="images/header-image-mobile.jpg">
+      <img src="images/header-image.jpg" alt="OMEGA" class="main-header__img">
+    </picture>
+
+    <div class="catalog-wrapper">
+      <!-- Прозрачная кнопка поверх картинки -->
+      <button type="button" class="catalog-btn" id="catalogBtn" aria-label="Каталог" aria-expanded="false"></button>
+      <!-- Контейнер для мега-меню -->
+      <div class="mega-menu" id="megaMenu">
+        <div class="mega-menu__header">
+          <span>КАТАЛОГ ТОВАРІВ</span>
+          <span class="mega-menu__arrow" id="menuCloseBtn" style="cursor:pointer;">✕</span>
+        </div>
+        <div class="mega-menu__body">
+          <ul class="mega-menu__col mega-menu__col--level1" id="menuLevel1"></ul>
+          <ul class="mega-menu__col mega-menu__col--level2" id="menuLevel2"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="mainContent" class="catalog-main-view">
+  <!-- Сюда будет рендериться контент при выборе категории -->
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Закрити">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>
+  <img src="images/footer-image.jpg" alt="Футер сайту" onerror="this.style.display='none'" />
+</footer>
+
+<!-- Подключаем библиотеку для чтения Excel (нужна для меню) -->
+<script src="scripts/xlsx.full.min.js"></script>
+
+<!-- Подключаем main.js (логика выпадающего меню) -->
+<script src="scripts/menu.js"></script>
+
+<!-- connector.js ОТКЛЮЧЕН (закомментирован) -->
+<!-- <script src="scripts/connector.js"></script> -->
+
+</body>
+</html>
